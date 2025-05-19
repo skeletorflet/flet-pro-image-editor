@@ -56,6 +56,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install flet-cli==$FLET_CLI_VERSION
 
+    - name: Fix pyproject.toml paths for macOS
+      run: |
+        cd $EXAMPLE_DIR
+        # Reemplazar las rutas con barras invertidas por rutas con barras normales
+        sed -i '' 's/\.\.\\\.\./\.\.\/.\./' pyproject.toml
+
+    - name: Install package in development mode
+      run: |
+        cd $EXAMPLE_DIR
+        pip install -e ../..
+
     - name: Flet Build IPA
       run: |
         cd $EXAMPLE_DIR
