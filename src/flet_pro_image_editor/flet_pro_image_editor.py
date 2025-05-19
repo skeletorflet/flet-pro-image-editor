@@ -1,7 +1,7 @@
 import flet as ft
 import flet.version
-from flet_core.control import Control, OptionalNumber
-from flet_core.ref import Ref
+from flet.core.control import Control, OptionalNumber
+from flet.core.ref import Ref
 from typing import Any, Callable, Optional, Union, List, Dict
 
 
@@ -57,13 +57,13 @@ class ProImageEditor(ft.Control):
         if crop_ratio:
             args["crop_ratio"] = crop_ratio
 
-        return self._invoke_method("open_editor", args)
+        return self.invoke_method("open_editor", args)
 
     def close_editor(self):
         """
         Cierra el editor de imágenes.
         """
-        return self._invoke_method("close_editor", {})
+        return self.invoke_method("close_editor", {})
 
     def open(self, dialog):
         """
@@ -81,7 +81,7 @@ class ProImageEditor(ft.Control):
         if self._crop_ratio:
             args["crop_ratio"] = self._crop_ratio
 
-        return self._invoke_method("open", args)
+        return self.invoke_method("open", args)
 
     def close(self, dialog):
         """
@@ -90,4 +90,35 @@ class ProImageEditor(ft.Control):
         Args:
             dialog: El control ProImageEditor a cerrar
         """
-        return self._invoke_method("close", {})
+        return self.invoke_method("close", {})
+        
+    # Implementación correcta de los manejadores de eventos
+    @property
+    def on_editing_complete(self):
+        """
+        Evento que se dispara cuando se completa la edición de la imagen.
+        
+        El evento contiene información sobre la imagen editada en el campo `data`.
+        
+        Returns:
+            El manejador de eventos actual.
+        """
+        return self._get_event_handler("editing_complete")
+        
+    @on_editing_complete.setter
+    def on_editing_complete(self, handler):
+        self._add_event_handler("editing_complete", handler)
+        
+    @property
+    def on_editing_cancel(self):
+        """
+        Evento que se dispara cuando se cancela la edición de la imagen.
+        
+        Returns:
+            El manejador de eventos actual.
+        """
+        return self._get_event_handler("editing_cancel")
+        
+    @on_editing_cancel.setter
+    def on_editing_cancel(self, handler):
+        self._add_event_handler("editing_cancel", handler)

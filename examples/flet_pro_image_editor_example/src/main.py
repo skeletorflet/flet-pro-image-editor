@@ -22,6 +22,7 @@ def main(page: ft.Page):
 
     # Función para manejar cuando se completa la edición
     def on_editing_complete(e):
+        print("ok")
         try:
             print(f"Edición completada, recibidos {len(e.data.split(','))} bytes")
             status_text.value = f"Imagen editada: {len(e.data.split(','))} bytes"
@@ -78,14 +79,14 @@ def main(page: ft.Page):
         image_container.visible = False
         image_label.visible = False
         page.update()
-        
+
         # Configurar el editor con la imagen
         editor.open_editor(
             source="network",
             path="https://picsum.photos/500/500",
             crop_ratio="1.0",  # Relación de aspecto cuadrada
         )
-        
+
         # Abrir el editor como un diálogo
         page.open(editor)
 
@@ -96,14 +97,14 @@ def main(page: ft.Page):
         image_container.visible = False
         image_label.visible = False
         page.update()
-        
+
         # Configurar el editor con la imagen local
         editor.open_editor(
             source="file",
             path="C:/Users/Julian/Desktop/flet_extensions/pro_image_editor/examples/flet_pro_image_editor_example/src/assets/sample.jpg",
             crop_ratio="4/3",  # Relación de aspecto 4:3
         )
-        
+
         # Abrir el editor como un diálogo
         page.open(editor)
 
@@ -114,14 +115,14 @@ def main(page: ft.Page):
         image_container.visible = False
         image_label.visible = False
         page.update()
-        
+
         # Configurar el editor con la imagen de asset
         editor.open_editor(
             source="asset",
             path="assets/sample_asset.jpg",
             crop_ratio="16/9",  # Relación de aspecto 16:9
         )
-        
+
         # Abrir el editor como un diálogo
         page.open(editor)
 

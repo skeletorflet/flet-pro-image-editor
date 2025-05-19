@@ -59,13 +59,18 @@ jobs:
     - name: Fix pyproject.toml paths for macOS
       run: |
         cd $EXAMPLE_DIR
-        # Reemplazar las rutas con barras invertidas por rutas con barras normales
-        sed -i '' 's/\.\.\\\.\./\.\.\/.\./' pyproject.toml
+        # Mostrar el contenido original para depuración
+        cat pyproject.toml
+        # Crear un archivo temporal con las rutas corregidas
+        cat pyproject.toml | sed 's/\.\.\\\.\./\.\.\/\.\./' > pyproject_fixed.toml
+        # Reemplazar el archivo original con el corregido
+        mv pyproject_fixed.toml pyproject.toml
+        # Mostrar el contenido modificado para verificar
+        cat pyproject.toml
 
     - name: Install package in development mode
       run: |
-        cd $EXAMPLE_DIR
-        pip install -e ../..
+        pip install -e .
 
     - name: Flet Build IPA
       run: |
@@ -73,9 +78,9 @@ jobs:
         flet build ipa --verbose --build-number=$BUILD_NUMBER --build-version=$BUILD_VERSION 
 
     - name: Upload IPA Artifact
-      uses: actions/upload-artifact@v4.3.4  # https://github.com/marketplace/actions/upload-a-build-artifact
+      uses: actions/upload-artifact@v4.3.4
       with:
-        name: ipa-build-artifact  # the name of the artifact
-        path: ${{ env.EXAMPLE_DIR }}/build/ipa  # location of Flet build output
-        if-no-files-found: error  # Fail the action with an error message if no files are found
-        overwrite: false  # If true, an artifact with a matching name will be deleted before a new one is uploaded. If false, the action will fail if an artifact for the given name already exists. Does not fail if the artifact does not exist.
+        name: ipa-build-artifact
+        path: ${{ env.EXAMPLE_DIR }}/build/ipa
+        if-no-files-found: error
+        overwrite: false
