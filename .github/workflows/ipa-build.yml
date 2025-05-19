@@ -34,9 +34,6 @@ env:
   # Disables progress bars when using UV
   UV_NO_PROGRESS: 1
 
-defaults:
-  run:
-    working-directory: ./examples/flet_pro_image_editor_example
 
 jobs:
   build:
