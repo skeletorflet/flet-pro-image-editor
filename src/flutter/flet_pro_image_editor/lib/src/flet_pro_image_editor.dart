@@ -29,6 +29,7 @@ class FletProImageEditorControl extends StatefulWidget {
 class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
   bool _isEditing = false;
   Uint8List? _editedImage;
+  bool _isOpen = false;
 
   @override
   void initState() {
@@ -49,9 +50,101 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
         return _openEditor(args);
       case "close_editor":
         return _closeEditor();
+      case "open":
+        return _openDialog(args);
+      case "close":
+        return _closeDialog();
       default:
         return null;
     }
+  }
+
+  Future<String?> _openDialog(Map<String, String> args) async {
+    setState(() {
+      _isOpen = true;
+    });
+    
+    // Obtener configuraciones del editor
+    String? imageSource = args["source"];
+    String? imagePath = args["path"];
+    
+    if (imageSource == null || imagePath == null) {
+      return "error: Se requiere source y path";
+    }
+    
+    // Configuraciones del editor
+    ProImageEditorConfigs configs = ProImageEditorConfigs(
+      cropRotateEditor: args["crop_ratio"] != null
+          ? CropRotateEditorConfigs(
+              initAspectRatio: double.tryParse(args["crop_ratio"]!),
+            )
+          : const CropRotateEditorConfigs(),
+      mainEditor: const MainEditorConfigs(),
+    );
+    
+    // Crear el widget del editor según la fuente
+    Widget editorWidget;
+    if (imageSource == "network") {
+      editorWidget = ProImageEditor.network(
+        imagePath,
+        configs: configs,
+        callbacks: ProImageEditorCallbacks(
+          onImageEditingComplete: _handleEditingComplete,
+          onCloseEditor: (_) async => await _handleEditingCancel(),
+        ),
+      );
+    } else if (imageSource == "file") {
+      editorWidget = ProImageEditor.file(
+        imagePath,
+        configs: configs,
+        callbacks: ProImageEditorCallbacks(
+          onImageEditingComplete: _handleEditingComplete,
+          onCloseEditor: (_) async => await _handleEditingCancel(),
+        ),
+      );
+    } else if (imageSource == "asset") {
+      editorWidget = ProImageEditor.asset(
+        imagePath,
+        configs: configs,
+        callbacks: ProImageEditorCallbacks(
+          onImageEditingComplete: _handleEditingComplete,
+          onCloseEditor: (_) async => await _handleEditingCancel(),
+        ),
+      );
+    } else {
+      return "error: Fuente de imagen no válida. Use 'network', 'file' o 'asset'";
+    }
+    
+    // Mostrar el editor como un diálogo
+    if (context.mounted) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog(
+            insetPadding: EdgeInsets.zero,
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: Colors.black,
+              child: editorWidget,
+            ),
+          );
+        },
+      );
+    }
+    
+    return "success";
+  }
+
+  Future<String?> _closeDialog() async {
+    if (_isOpen && context.mounted) {
+      Navigator.of(context, rootNavigator: true).pop();
+      setState(() {
+        _isOpen = false;
+      });
+    }
+    return "success";
   }
 
   Future<String?> _openEditor(Map<String, String> args) async {

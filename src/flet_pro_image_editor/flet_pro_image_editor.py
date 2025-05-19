@@ -1,202 +1,93 @@
-from typing import Any, Optional, Dict, List, Union, Callable
+import flet as ft
+import flet.version
+from flet_core.control import Control, OptionalNumber
+from flet_core.ref import Ref
+from typing import Any, Callable, Optional, Union, List, Dict
 
-from flet.core.constrained_control import ConstrainedControl
-from flet.core.control import OptionalNumber, Control
-from flet.core.types import OptionalControlEventCallable
 
-
-class ProImageEditor(ConstrainedControl):
-    """
-    Un control para editar imágenes utilizando el paquete pro_image_editor de Flutter.
-
-    Este control permite abrir un editor de imágenes avanzado para modificar imágenes
-    desde diferentes fuentes (red, archivo local o asset). El editor proporciona
-    herramientas como recorte, rotación, filtros y más.
-
-    Ejemplo:
-    ```python
-    import flet as ft
-    from flet_pro_image_editor import ProImageEditor
-
-    def main(page: ft.Page):
-        def on_editing_complete(e):
-            # e.data contiene los bytes de la imagen editada como string separado por comas
-            print(f"Edición completada, tamaño: {len(e.data.split(','))} bytes")
-            # Aquí puedes convertir e.data a bytes si lo necesitas
-            # bytes_data = bytes([int(b) for b in e.data.split(',')])
-
-        def on_editing_cancel(e):
-            print("Edición cancelada")
-
-        def edit_image_clicked(e):
-            # Abrir el editor con una imagen de la red
-            editor.open_editor(
-                source="network",
-                path="https://picsum.photos/500/500",
-                crop_ratio="1.0"
-            )
-
-        editor = ProImageEditor(
-            show_status=True,
-            on_editing_complete=on_editing_complete,
-            on_editing_cancel=on_editing_cancel
-        )
-
-        page.add(
-            editor,
-            ft.ElevatedButton("Editar imagen", on_click=edit_image_clicked)
-        )
-
-    ft.app(target=main)
-    ```
-    """
-
+class ProImageEditor(ft.Control):
     def __init__(
         self,
+        show_status: bool = False,
+        on_editing_complete=None,
+        on_editing_cancel=None,
         #
-        # Control
-        #
-        ref=None,
-        key: Optional[str] = None,
-        width: OptionalNumber = None,
-        height: OptionalNumber = None,
-        expand: Union[None, bool, int] = None,
-        opacity: OptionalNumber = None,
-        tooltip: Optional[str] = None,
-        visible: Optional[bool] = None,
+        ref: Optional[Ref] = None,
         disabled: Optional[bool] = None,
+        visible: Optional[bool] = None,
         data: Any = None,
-        #
-        # ConstrainedControl
-        #
-        left: OptionalNumber = None,
-        top: OptionalNumber = None,
-        right: OptionalNumber = None,
-        bottom: OptionalNumber = None,
-        #
-        # ProImageEditor specific
-        #
-        show_status: Optional[bool] = None,
-        on_editing_complete: OptionalControlEventCallable = None,
-        on_editing_cancel: OptionalControlEventCallable = None,
     ):
-        ConstrainedControl.__init__(
-            self,
-            ref=ref,
-            key=key,
-            width=width,
-            height=height,
-            expand=expand,
-            opacity=opacity,
-            tooltip=tooltip,
-            visible=visible,
-            disabled=disabled,
-            data=data,
-            left=left,
-            top=top,
-            right=right,
-            bottom=bottom,
-        )
-
+        super().__init__(ref=ref, disabled=disabled, visible=visible, data=data)
         self.show_status = show_status
         self.on_editing_complete = on_editing_complete
         self.on_editing_cancel = on_editing_cancel
+        self._source = None
+        self._path = None
+        self._crop_ratio = None
 
     def _get_control_name(self):
         return "flet_pro_image_editor"
 
-    # show_status
-    @property
-    def show_status(self) -> Optional[bool]:
-        """
-        Determina si se muestra un indicador visual del estado del editor.
+    def _get_children(self):
+        return []
 
-        Si es True, se mostrará un widget con información sobre el estado actual
-        del editor (listo, editando, o imagen editada). Si es False, el control
-        será invisible.
+    def _before_build_command(self):
+        super()._before_build_command()
 
-        Returns:
-            Optional[bool]: True si se muestra el estado, False si no.
-        """
-        return self._get_attr("show_status", data_type="bool")
+    def _build(self):
+        args = {}
+        if self.show_status:
+            args["showStatus"] = "true"
+        return super()._build() | args
 
-    @show_status.setter
-    def show_status(self, value: Optional[bool]):
-        self._set_attr("show_status", value)
-
-    # on_editing_complete
-    @property
-    def on_editing_complete(self) -> OptionalControlEventCallable:
-        """
-        Evento que se dispara cuando se completa la edición de una imagen.
-
-        El evento contiene en su propiedad `data` una cadena de texto con los bytes
-        de la imagen editada, separados por comas. Estos bytes pueden convertirse
-        a un objeto bytes de Python si es necesario.
-
-        Returns:
-            OptionalControlEventCallable: El manejador de eventos actual.
-        """
-        return self._get_event_handler("editing_complete")
-
-    @on_editing_complete.setter
-    def on_editing_complete(self, handler: OptionalControlEventCallable):
-        self._add_event_handler("editing_complete", handler)
-
-    # on_editing_cancel
-    @property
-    def on_editing_cancel(self) -> OptionalControlEventCallable:
-        """
-        Evento que se dispara cuando se cancela la edición de una imagen.
-
-        Returns:
-            OptionalControlEventCallable: El manejador de eventos actual.
-        """
-        return self._get_event_handler("editing_cancel")
-
-    @on_editing_cancel.setter
-    def on_editing_cancel(self, handler: OptionalControlEventCallable):
-        self._add_event_handler("editing_cancel", handler)
-
-    def open_editor(
-        self, source: str, path: str, crop_ratio: Optional[str] = None
-    ) -> None:
+    def open_editor(self, source: str, path: str, crop_ratio: str = None):
         """
         Abre el editor de imágenes con la imagen especificada.
 
         Args:
-            source: La fuente de la imagen. Puede ser "network", "file" o "asset".
-            path: La ruta a la imagen, dependiendo de la fuente:
-                - Para "network": URL de la imagen
-                - Para "file": Ruta al archivo local
-                - Para "asset": Ruta al asset en el paquete
-            crop_ratio: Relación de aspecto opcional para el recorte (por ejemplo, "1.0" para cuadrado)
-
-        Raises:
-            ValueError: Si source no es válido o path está vacío.
+            source: Fuente de la imagen ('network', 'file', 'asset')
+            path: Ruta a la imagen
+            crop_ratio: Relación de aspecto para el recorte (ej. '1.0', '4/3', '16/9')
         """
-        if not source or not path:
-            raise ValueError("Se requieren source y path")
+        self._source = source
+        self._path = path
+        self._crop_ratio = crop_ratio
 
-        if source not in ["network", "file", "asset"]:
-            raise ValueError("source debe ser 'network', 'file' o 'asset'")
-
-        args = {
-            "source": source,
-            "path": path,
-        }
-
-        if crop_ratio is not None:
+        args = {"source": source, "path": path}
+        if crop_ratio:
             args["crop_ratio"] = crop_ratio
 
-        self.invoke_method("open_editor", args)
+        return self._invoke_method("open_editor", args)
 
-    def close_editor(self) -> None:
+    def close_editor(self):
         """
-        Cierra el editor de imágenes si está abierto y oculta el control.
+        Cierra el editor de imágenes.
+        """
+        return self._invoke_method("close_editor", {})
 
-        Este método debe llamarse cuando se desea cerrar explícitamente el editor,
-        o puede usarse en los manejadores de eventos on_editing_complete y on_editing_cancel
-        para asegurar que el control se oculte correctamente.
+    def open(self, dialog):
         """
-        self.invoke_method("close_editor", {})
+        Abre el editor de imágenes como un diálogo.
+
+        Args:
+            dialog: El control ProImageEditor a abrir
+        """
+        if not self._source or not self._path:
+            raise ValueError(
+                "Debe llamar a open_editor primero para configurar la imagen"
+            )
+
+        args = {"source": self._source, "path": self._path}
+        if self._crop_ratio:
+            args["crop_ratio"] = self._crop_ratio
+
+        return self._invoke_method("open", args)
+
+    def close(self, dialog):
+        """
+        Cierra el editor de imágenes.
+
+        Args:
+            dialog: El control ProImageEditor a cerrar
+        """
+        return self._invoke_method("close", {})

@@ -78,11 +78,16 @@ def main(page: ft.Page):
         image_container.visible = False
         image_label.visible = False
         page.update()
+        
+        # Configurar el editor con la imagen
         editor.open_editor(
             source="network",
             path="https://picsum.photos/500/500",
             crop_ratio="1.0",  # Relación de aspecto cuadrada
         )
+        
+        # Abrir el editor como un diálogo
+        page.open(editor)
 
     # Función para abrir el editor con una imagen local
     def open_local_image(e):
@@ -91,11 +96,16 @@ def main(page: ft.Page):
         image_container.visible = False
         image_label.visible = False
         page.update()
+        
+        # Configurar el editor con la imagen local
         editor.open_editor(
             source="file",
-            path="C:/Users/Julian/Desktop/flet_extensions/pro_image_editor/examples/flet_pro_image_editor_example/src/assets/sample.jpg",  # Ruta relativa al archivo
+            path="C:/Users/Julian/Desktop/flet_extensions/pro_image_editor/examples/flet_pro_image_editor_example/src/assets/sample.jpg",
             crop_ratio="4/3",  # Relación de aspecto 4:3
         )
+        
+        # Abrir el editor como un diálogo
+        page.open(editor)
 
     # Función para abrir el editor con un asset
     def open_asset_image(e):
@@ -104,11 +114,16 @@ def main(page: ft.Page):
         image_container.visible = False
         image_label.visible = False
         page.update()
+        
+        # Configurar el editor con la imagen de asset
         editor.open_editor(
             source="asset",
             path="assets/sample_asset.jpg",
             crop_ratio="16/9",  # Relación de aspecto 16:9
         )
+        
+        # Abrir el editor como un diálogo
+        page.open(editor)
 
     # Función para guardar la imagen editada como archivo
     def save_edited_image(e):
@@ -171,7 +186,6 @@ def main(page: ft.Page):
                             "Guardar imagen",
                             on_click=save_edited_image,
                             icon=ft.Icons.SAVE,
-                            # disabled=not image_container.visible,
                         ),
                     ],
                     spacing=10,
@@ -184,6 +198,9 @@ def main(page: ft.Page):
         image_label,
         image_container,
     )
+
+    # Mostrar un diálogo de bienvenida al iniciar la aplicación
+    page.open(ft.AlertDialog(title=ft.Text("Bienvenido al Pro Image Editor")))
 
 
 ft.app(target=main)

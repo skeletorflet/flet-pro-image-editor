@@ -23,7 +23,7 @@ env:
   PYTHON_VERSION: 3.12.8
 
   # flet-cli version to install for `flet build`
-  FLET_CLI_VERSION: 0.27.5
+  FLET_CLI_VERSION: 0.28.2
 
   # Ensures Python uses UTF-8 encoding by default
   PYTHONUTF8: 1
@@ -33,6 +33,9 @@ env:
 
   # Disables progress bars when using UV
   UV_NO_PROGRESS: 1
+
+  # Directorio del ejemplo que contiene el pyproject.toml
+  EXAMPLE_DIR: examples/flet_pro_image_editor_example
 
 
 jobs:
@@ -55,12 +58,13 @@ jobs:
 
     - name: Flet Build IPA
       run: |
+        cd $EXAMPLE_DIR
         flet build ipa --verbose --build-number=$BUILD_NUMBER --build-version=$BUILD_VERSION 
 
     - name: Upload IPA Artifact
       uses: actions/upload-artifact@v4.3.4  # https://github.com/marketplace/actions/upload-a-build-artifact
       with:
         name: ipa-build-artifact  # the name of the artifact
-        path: build/ipa  # location of Flet build output
+        path: ${{ env.EXAMPLE_DIR }}/build/ipa  # location of Flet build output
         if-no-files-found: error  # Fail the action with an error message if no files are found
         overwrite: false  # If true, an artifact with a matching name will be deleted before a new one is uploaded. If false, the action will fail if an artifact for the given name already exists. Does not fail if the artifact does not exist.
