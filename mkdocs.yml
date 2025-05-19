@@ -1,0 +1,7 @@
+site_name: FletProImageEditor
+
+theme:
+  name: "material"
+
+plugins:
+  - mkdocstrings

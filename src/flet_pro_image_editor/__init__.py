@@ -1,0 +1,1 @@
+from flet_pro_image_editor.flet_pro_image_editor import ProImageEditor
