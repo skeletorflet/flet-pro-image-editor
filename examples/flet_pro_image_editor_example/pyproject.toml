@@ -32,7 +32,7 @@ copyright = "Copyright (C) 2025 by MyCompany"
 path = "src"
 
 [tool.flet.dev_packages]
-flet-pro-image-editor = "../.." # relative path
+flet-pro-image-editor = "..\.." # relative path
 
 [tool.uv]
 dev-dependencies = [
@@ -40,8 +40,8 @@ dev-dependencies = [
 ]
 
 [tool.uv.sources]
-flet-pro-image-editor = { path = "../../", editable = true }
+flet-pro-image-editor = { path = "..\..\", editable = true }
 
 [tool.poetry.group.dev.dependencies]
 flet = {extras = ["all"], version = "0.28.2"}
-flet-pro-image-editor = {path = "../../", develop = true}
+flet-pro-image-editor = {path = "..\..\", develop = true}
