@@ -150,7 +150,7 @@ def main(page: ft.Page):
         ft.Text("Ejemplo de Pro Image Editor", size=24, weight="bold"),
         ft.Row(
             [
-                ft.Row(
+                ft.Column(
                     [
                         ft.ElevatedButton(
                             "Editar imagen de picsum",
