@@ -64,19 +64,19 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
     if (_isOpen && context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
     }
-    
+
     setState(() {
       _isOpen = true;
     });
-    
+
     // Obtener configuraciones del editor
     String? imageSource = args["source"];
     String? imagePath = args["path"];
-    
+
     if (imageSource == null || imagePath == null) {
       return "error: Se requiere source y path";
     }
-    
+
     // Configuraciones del editor
     ProImageEditorConfigs configs = ProImageEditorConfigs(
       cropRotateEditor: args["crop_ratio"] != null
@@ -86,7 +86,7 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
           : const CropRotateEditorConfigs(),
       mainEditor: const MainEditorConfigs(),
     );
-    
+
     // Crear el widget del editor según la fuente
     Widget editorWidget;
     if (imageSource == "network") {
@@ -119,17 +119,19 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
     } else {
       return "error: Fuente de imagen no válida. Use 'network', 'file' o 'asset'";
     }
-    
+
     // Mostrar el editor como un diálogo
     if (context.mounted) {
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return WillPopScope(
-            onWillPop: () async {
-              await _handleEditingCancel();
-              return false;
+          return PopScope(
+            canPop: false,
+            onPopInvoked: (didPop) async {
+              if (!didPop) {
+                await _handleEditingCancel();
+              }
             },
             child: Dialog(
               insetPadding: EdgeInsets.zero,
@@ -144,7 +146,7 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
         },
       );
     }
-    
+
     return "success";
   }
 
@@ -246,11 +248,11 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
     // Primero disparamos el evento antes de cerrar el diálogo
     List<int> bytesList = editedImage.toList();
     String bytesString = bytesList.join(',');
-    
+
     // Disparar el evento con el nombre correcto
     widget.backend.triggerControlEvent(
         widget.control.id, "editing_complete", bytesString);
-    
+
     // Luego actualizamos el estado
     setState(() {
       _editedImage = editedImage;
@@ -268,9 +270,8 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
 
   Future<void> _handleEditingCancel() async {
     // Primero disparamos el evento antes de cerrar el diálogo
-    widget.backend.triggerControlEvent(
-        widget.control.id, "editing_cancel", "");
-    
+    widget.backend.triggerControlEvent(widget.control.id, "editing_cancel", "");
+
     // Luego actualizamos el estado
     setState(() {
       _isEditing = false;
@@ -283,7 +284,7 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
         _isOpen = false;
       });
     }
-    
+
     // Asegurarse de cerrar la página del editor si está abierta
     if (Navigator.of(context).canPop() && context.mounted) {
       Navigator.of(context).pop();
