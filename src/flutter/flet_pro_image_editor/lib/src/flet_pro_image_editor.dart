@@ -60,6 +60,11 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
   }
 
   Future<String?> _openDialog(Map<String, String> args) async {
+    // Cerrar cualquier diálogo existente primero
+    if (_isOpen && context.mounted) {
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+    
     setState(() {
       _isOpen = true;
     });
@@ -121,13 +126,19 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return Dialog(
-            insetPadding: EdgeInsets.zero,
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: Colors.black,
-              child: editorWidget,
+          return WillPopScope(
+            onWillPop: () async {
+              await _handleEditingCancel();
+              return false;
+            },
+            child: Dialog(
+              insetPadding: EdgeInsets.zero,
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: Colors.black,
+                child: editorWidget,
+              ),
             ),
           );
         },
@@ -232,18 +243,19 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
 
   // Asegurarse de que los eventos se disparen con el nombre correcto
   Future<void> _handleEditingComplete(Uint8List editedImage) async {
+    // Primero disparamos el evento antes de cerrar el diálogo
+    List<int> bytesList = editedImage.toList();
+    String bytesString = bytesList.join(',');
+    
+    // Disparar el evento con el nombre correcto
+    widget.backend.triggerControlEvent(
+        widget.control.id, "editing_complete", bytesString);
+    
+    // Luego actualizamos el estado
     setState(() {
       _editedImage = editedImage;
       _isEditing = false;
     });
-
-    // Convertir la imagen a una lista de enteros para enviarla a Python
-    List<int> bytesList = editedImage.toList();
-    String bytesString = bytesList.join(',');
-
-    // Disparar el evento con el nombre correcto
-    widget.backend.triggerControlEvent(
-        widget.control.id, "editing_complete", bytesString);
 
     // Cerrar el diálogo si está abierto
     if (_isOpen && context.mounted) {
@@ -255,13 +267,14 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
   }
 
   Future<void> _handleEditingCancel() async {
+    // Primero disparamos el evento antes de cerrar el diálogo
+    widget.backend.triggerControlEvent(
+        widget.control.id, "editing_cancel", "");
+    
+    // Luego actualizamos el estado
     setState(() {
       _isEditing = false;
     });
-
-    // Disparar el evento con el nombre correcto
-    widget.backend.triggerControlEvent(
-        widget.control.id, "editing_cancel", "");
 
     // Cerrar el diálogo si está abierto
     if (_isOpen && context.mounted) {
@@ -270,12 +283,25 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
         _isOpen = false;
       });
     }
+    
+    // Asegurarse de cerrar la página del editor si está abierta
+    if (Navigator.of(context).canPop() && context.mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   Future<String?> _closeEditor() async {
     // Cerrar la página del editor si está abierta
-    if (Navigator.of(context).canPop()) {
+    if (context.mounted && Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
+    }
+
+    // Cerrar el diálogo si está abierto
+    if (_isOpen && context.mounted) {
+      Navigator.of(context, rootNavigator: true).pop();
+      setState(() {
+        _isOpen = false;
+      });
     }
 
     // Actualizar el estado local y limpiar la imagen editada

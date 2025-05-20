@@ -19,11 +19,13 @@ class ProImageEditor(ft.Control):
     ):
         super().__init__(ref=ref, disabled=disabled, visible=visible, data=data)
         self.show_status = show_status
-        self.on_editing_complete = on_editing_complete
-        self.on_editing_cancel = on_editing_cancel
         self._source = None
         self._path = None
         self._crop_ratio = None
+        
+        # Registrar los manejadores de eventos directamente
+        self._add_event_handler("editing_complete", on_editing_complete)
+        self._add_event_handler("editing_cancel", on_editing_cancel)
 
     def _get_control_name(self):
         return "flet_pro_image_editor"
@@ -92,17 +94,9 @@ class ProImageEditor(ft.Control):
         """
         return self.invoke_method("close", {})
         
-    # Implementación correcta de los manejadores de eventos
+    # Implementación simplificada de los manejadores de eventos
     @property
     def on_editing_complete(self):
-        """
-        Evento que se dispara cuando se completa la edición de la imagen.
-        
-        El evento contiene información sobre la imagen editada en el campo `data`.
-        
-        Returns:
-            El manejador de eventos actual.
-        """
         return self._get_event_handler("editing_complete")
         
     @on_editing_complete.setter
@@ -111,12 +105,6 @@ class ProImageEditor(ft.Control):
         
     @property
     def on_editing_cancel(self):
-        """
-        Evento que se dispara cuando se cancela la edición de la imagen.
-        
-        Returns:
-            El manejador de eventos actual.
-        """
         return self._get_event_handler("editing_cancel")
         
     @on_editing_cancel.setter
