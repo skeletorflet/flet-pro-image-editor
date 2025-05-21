@@ -3,6 +3,7 @@ import flet.version
 from flet.core.control import Control, OptionalNumber
 from flet.core.ref import Ref
 from typing import Any, Callable, Optional, Union, List, Dict
+from .editor_configs import ProImageEditorConfigs
 
 
 class ProImageEditor(ft.Control):
@@ -11,6 +12,7 @@ class ProImageEditor(ft.Control):
         show_status: bool = False,
         on_editing_complete=None,
         on_editing_cancel=None,
+        configs: Optional[ProImageEditorConfigs] = None, # New parameter
         #
         ref: Optional[Ref] = None,
         disabled: Optional[bool] = None,
@@ -18,6 +20,7 @@ class ProImageEditor(ft.Control):
         data: Any = None,
     ):
         super().__init__(ref=ref, disabled=disabled, visible=visible, data=data)
+        self.configs = configs
         self.show_status = show_status
         self._source = None
         self._path = None
@@ -35,6 +38,10 @@ class ProImageEditor(ft.Control):
 
     def _before_build_command(self):
         super()._before_build_command()
+        if self.configs is not None:
+            self._set_attr("configs", self.configs.to_dict())
+        else:
+            self._set_attr("configs", None) # Ensure it's explicitly null if not provided
 
     def _build(self):
         args = {}

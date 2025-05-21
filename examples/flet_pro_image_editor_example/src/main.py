@@ -1,6 +1,13 @@
 import flet as ft
 import base64
 from flet_pro_image_editor import ProImageEditor
+from flet_pro_image_editor.editor_configs import (
+    ProImageEditorConfigs,
+    ImageEditorDesignMode,
+    TextEditorConfigs,
+    EmojiEditorConfigs,
+    # Import other configs you might want to demonstrate
+)
 from io import BytesIO
 from PIL import Image
 
@@ -64,11 +71,23 @@ def main(page: ft.Page):
         status_text.value = "Edición cancelada"
         page.update()
 
+    # Create and customize editor configurations
+    custom_configs = ProImageEditorConfigs(
+        hero_tag="MyCustomEditorHeroTag",
+        design_mode=ImageEditorDesignMode.cupertino, # Example: Use Cupertino design
+        text_editor=TextEditorConfigs(), # Assuming TextEditorConfigs can be customized
+        emoji_editor=EmojiEditorConfigs(), # Assuming EmojiEditorConfigs can be customized
+        # You can add more customizations here as needed
+        # For example, if MainEditorConfigs had a 'showAppBar' attribute:
+        # main_editor=MainEditorConfigs(showAppBar=False)
+    )
+
     # Crear el control de editor de imágenes
     editor = ProImageEditor(
         show_status=True,
         on_editing_complete=on_editing_complete,
         on_editing_cancel=on_editing_cancel,
+        configs=custom_configs,  # Pass the custom configurations
     )
 
     # Función para abrir el editor con una imagen de picsum de 500x500
