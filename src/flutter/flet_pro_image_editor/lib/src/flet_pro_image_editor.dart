@@ -2,6 +2,7 @@ import 'package:flet/flet.dart';
 import 'package:flutter/material.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
 import 'dart:typed_data';
+import '../models/pro_image_editor_configs.dart'; // Added import
 
 class FletProImageEditorControl extends StatefulWidget {
   final Control? parent;
@@ -30,6 +31,7 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
   bool _isEditing = false;
   Uint8List? _editedImage;
   bool _isOpen = false;
+  ProImageEditorConfigs _editorConfigs = const ProImageEditorConfigs(); // Add this line
 
   @override
   void initState() {
@@ -42,6 +44,24 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
     widget.backend.unsubscribeMethods(widget.control.id);
     super.dispose();
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final rawConfigs = widget.control.attrs["configs"];
+    if (rawConfigs is Map) {
+      final configsMap = Map<String, dynamic>.from(rawConfigs);
+      setState(() {
+        // Now calls the full fromJson method from the ProImageEditorConfigs class
+        _editorConfigs = ProImageEditorConfigs.fromJson(configsMap);
+      });
+    } else {
+      // Optionally, log if configs are not a map or not provided
+      // _editorConfigs will remain its default (e.g., const ProImageEditorConfigs())
+    }
+  }
+
+  // _parseDesignMode helper method is removed.
 
   Future<String?> _handleMethodCall(
       String methodName, Map<String, String> args) async {
@@ -77,22 +97,17 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
       return "error: Se requiere source y path";
     }
 
-    // Configuraciones del editor
-    ProImageEditorConfigs configs = ProImageEditorConfigs(
-      cropRotateEditor: args["crop_ratio"] != null
-          ? CropRotateEditorConfigs(
-              initAspectRatio: double.tryParse(args["crop_ratio"]!),
-            )
-          : const CropRotateEditorConfigs(),
-      mainEditor: const MainEditorConfigs(),
-    );
+    // _editorConfigs is now the single source of truth for configurations.
+    // Any specific argument like crop_ratio from args should ideally be part of the configs map.
+    // If there's a need to override parts of _editorConfigs based on direct method args,
+    // that logic would go here, potentially creating a modified copy of _editorConfigs.
+    // For this update, we assume _editorConfigs is complete.
 
-    // Crear el widget del editor según la fuente
     Widget editorWidget;
     if (imageSource == "network") {
       editorWidget = ProImageEditor.network(
         imagePath,
-        configs: configs,
+        configs: _editorConfigs, // Use the state variable
         callbacks: ProImageEditorCallbacks(
           onImageEditingComplete: _handleEditingComplete,
           onCloseEditor: (_) async => await _handleEditingCancel(),
@@ -101,7 +116,7 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
     } else if (imageSource == "file") {
       editorWidget = ProImageEditor.file(
         imagePath,
-        configs: configs,
+        configs: _editorConfigs, // Use the state variable
         callbacks: ProImageEditorCallbacks(
           onImageEditingComplete: _handleEditingComplete,
           onCloseEditor: (_) async => await _handleEditingCancel(),
@@ -110,7 +125,7 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
     } else if (imageSource == "asset") {
       editorWidget = ProImageEditor.asset(
         imagePath,
-        configs: configs,
+        configs: _editorConfigs, // Use the state variable
         callbacks: ProImageEditorCallbacks(
           onImageEditingComplete: _handleEditingComplete,
           onCloseEditor: (_) async => await _handleEditingCancel(),
@@ -180,17 +195,11 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
         return "error: Se requiere source y path";
       }
 
-      // Configuraciones del editor
-      ProImageEditorConfigs configs = ProImageEditorConfigs(
-        // Configuración de CropRotateEditor para manejar la relación de aspecto
-        cropRotateEditor: args["crop_ratio"] != null
-            ? CropRotateEditorConfigs(
-                initAspectRatio: double.tryParse(args["crop_ratio"]!),
-              )
-            : const CropRotateEditorConfigs(),
-        // Configuración de MainEditor
-        mainEditor: const MainEditorConfigs(),
-      );
+    // _editorConfigs is now the single source of truth for configurations.
+    // Any specific argument like crop_ratio from args should ideally be part of the configs map.
+    // If there's a need to override parts of _editorConfigs based on direct method args,
+    // that logic would go here, potentially creating a modified copy of _editorConfigs.
+    // For this update, we assume _editorConfigs is complete.
 
       // Nota: Las propiedades availableOperations e initialOperation ya no están disponibles en la API actual
 
@@ -199,7 +208,7 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
       if (imageSource == "network") {
         editorWidget = ProImageEditor.network(
           imagePath,
-          configs: configs,
+          configs: _editorConfigs, // Use the state variable
           callbacks: ProImageEditorCallbacks(
             onImageEditingComplete: _handleEditingComplete,
             onCloseEditor: (_) async => await _handleEditingCancel(),
@@ -208,7 +217,7 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
       } else if (imageSource == "file") {
         editorWidget = ProImageEditor.file(
           imagePath,
-          configs: configs,
+          configs: _editorConfigs, // Use the state variable
           callbacks: ProImageEditorCallbacks(
             onImageEditingComplete: _handleEditingComplete,
             onCloseEditor: (_) async => await _handleEditingCancel(),
@@ -217,7 +226,7 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
       } else if (imageSource == "asset") {
         editorWidget = ProImageEditor.asset(
           imagePath,
-          configs: configs,
+          configs: _editorConfigs, // Use the state variable
           callbacks: ProImageEditorCallbacks(
             onImageEditingComplete: _handleEditingComplete,
             onCloseEditor: (_) async => await _handleEditingCancel(),
