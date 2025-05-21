@@ -1,8 +1,8 @@
 import 'package:flet/flet.dart';
 import 'package:flutter/material.dart';
-import 'package:pro_image_editor/pro_image_editor.dart';
+import 'package:pro_image_editor/pro_image_editor.dart' hide ProImageEditorConfigs, ImageEditorDesignMode, ThemeData; // Hide to avoid conflict with local models
 import 'dart:typed_data';
-import '../models/pro_image_editor_configs.dart'; // Added import
+import '../models/pro_image_editor_configs.dart'; // Crucial: Verify this path!
 
 class FletProImageEditorControl extends StatefulWidget {
   final Control? parent;
@@ -31,7 +31,7 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
   bool _isEditing = false;
   Uint8List? _editedImage;
   bool _isOpen = false;
-  ProImageEditorConfigs _editorConfigs = const ProImageEditorConfigs(); // Add this line
+  ProImageEditorConfigs _editorConfigs = const ProImageEditorConfigs();
 
   @override
   void initState() {
@@ -52,16 +52,12 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
     if (rawConfigs is Map) {
       final configsMap = Map<String, dynamic>.from(rawConfigs);
       setState(() {
-        // Now calls the full fromJson method from the ProImageEditorConfigs class
-        _editorConfigs = ProImageEditorConfigs.fromJson(configsMap);
+        _editorConfigs = ProImageEditorConfigs.fromJson(configsMap); // This is the call
       });
     } else {
-      // Optionally, log if configs are not a map or not provided
-      // _editorConfigs will remain its default (e.g., const ProImageEditorConfigs())
+      // _editorConfigs remains its default
     }
   }
-
-  // _parseDesignMode helper method is removed.
 
   Future<String?> _handleMethodCall(
       String methodName, Map<String, String> args) async {
@@ -80,259 +76,119 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
   }
 
   Future<String?> _openDialog(Map<String, String> args) async {
-    // Cerrar cualquier diálogo existente primero
     if (_isOpen && context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
     }
+    setState(() { _isOpen = true; });
 
-    setState(() {
-      _isOpen = true;
-    });
-
-    // Obtener configuraciones del editor
     String? imageSource = args["source"];
     String? imagePath = args["path"];
+    if (imageSource == null || imagePath == null) return "error: Se requiere source y path";
 
-    if (imageSource == null || imagePath == null) {
-      return "error: Se requiere source y path";
-    }
-
-    // _editorConfigs is now the single source of truth for configurations.
-    // Any specific argument like crop_ratio from args should ideally be part of the configs map.
-    // If there's a need to override parts of _editorConfigs based on direct method args,
-    // that logic would go here, potentially creating a modified copy of _editorConfigs.
-    // For this update, we assume _editorConfigs is complete.
+    // Use the _editorConfigs from state
+    final ProImageEditorConfigs currentConfigs = _editorConfigs;
 
     Widget editorWidget;
     if (imageSource == "network") {
-      editorWidget = ProImageEditor.network(
-        imagePath,
-        configs: _editorConfigs, // Use the state variable
-        callbacks: ProImageEditorCallbacks(
-          onImageEditingComplete: _handleEditingComplete,
-          onCloseEditor: (_) async => await _handleEditingCancel(),
-        ),
-      );
+      editorWidget = ProImageEditor.network(imagePath, configs: currentConfigs, callbacks: ProImageEditorCallbacks(onImageEditingComplete: _handleEditingComplete, onCloseEditor: (_) async => await _handleEditingCancel()));
     } else if (imageSource == "file") {
-      editorWidget = ProImageEditor.file(
-        imagePath,
-        configs: _editorConfigs, // Use the state variable
-        callbacks: ProImageEditorCallbacks(
-          onImageEditingComplete: _handleEditingComplete,
-          onCloseEditor: (_) async => await _handleEditingCancel(),
-        ),
-      );
+      editorWidget = ProImageEditor.file(imagePath, configs: currentConfigs, callbacks: ProImageEditorCallbacks(onImageEditingComplete: _handleEditingComplete, onCloseEditor: (_) async => await _handleEditingCancel()));
     } else if (imageSource == "asset") {
-      editorWidget = ProImageEditor.asset(
-        imagePath,
-        configs: _editorConfigs, // Use the state variable
-        callbacks: ProImageEditorCallbacks(
-          onImageEditingComplete: _handleEditingComplete,
-          onCloseEditor: (_) async => await _handleEditingCancel(),
-        ),
-      );
+      editorWidget = ProImageEditor.asset(imagePath, configs: currentConfigs, callbacks: ProImageEditorCallbacks(onImageEditingComplete: _handleEditingComplete, onCloseEditor: (_) async => await _handleEditingCancel()));
     } else {
       return "error: Fuente de imagen no válida. Use 'network', 'file' o 'asset'";
     }
 
-    // Mostrar el editor como un diálogo
     if (context.mounted) {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context) {
-          return PopScope(
-            canPop: false,
-            onPopInvoked: (didPop) async {
-              if (!didPop) {
-                await _handleEditingCancel();
-              }
-            },
-            child: Dialog(
-              insetPadding: EdgeInsets.zero,
-              child: Container(
-                width: double.infinity,
-                height: double.infinity,
-                color: Colors.black,
-                child: editorWidget,
-              ),
-            ),
-          );
-        },
+        builder: (BuildContext context) => PopScope(
+          canPop: false,
+          onPopInvoked: (didPop) async { if (!didPop) await _handleEditingCancel(); },
+          child: Dialog(insetPadding: EdgeInsets.zero, child: Container(width: double.infinity, height: double.infinity, color: Colors.black, child: editorWidget)),
+        ),
       );
     }
-
     return "success";
   }
 
   Future<String?> _closeDialog() async {
     if (_isOpen && context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
-      setState(() {
-        _isOpen = false;
-      });
+      setState(() { _isOpen = false; });
     }
     return "success";
   }
 
   Future<String?> _openEditor(Map<String, String> args) async {
-    // Asegurarse de que el estado se reinicie correctamente antes de abrir el editor
-    // Limpiar explícitamente la imagen editada y establecer el estado de edición
-    setState(() {
-      _isEditing = true;
-      _editedImage = null;
-    });
-
-    // Asegurar que cualquier cambio de estado se aplique antes de continuar
+    setState(() { _isEditing = true; _editedImage = null; });
     await Future.delayed(Duration.zero);
 
     try {
-      // Determinar la fuente de la imagen
       String? imageSource = args["source"];
       String? imagePath = args["path"];
+      if (imageSource == null || imagePath == null) return "error: Se requiere source y path";
 
-      if (imageSource == null || imagePath == null) {
-        return "error: Se requiere source y path";
-      }
+      // Use the _editorConfigs from state
+      final ProImageEditorConfigs currentConfigs = _editorConfigs;
 
-    // _editorConfigs is now the single source of truth for configurations.
-    // Any specific argument like crop_ratio from args should ideally be part of the configs map.
-    // If there's a need to override parts of _editorConfigs based on direct method args,
-    // that logic would go here, potentially creating a modified copy of _editorConfigs.
-    // For this update, we assume _editorConfigs is complete.
-
-      // Nota: Las propiedades availableOperations e initialOperation ya no están disponibles en la API actual
-
-      // Abrir el editor según la fuente
       Widget editorWidget;
       if (imageSource == "network") {
-        editorWidget = ProImageEditor.network(
-          imagePath,
-          configs: _editorConfigs, // Use the state variable
-          callbacks: ProImageEditorCallbacks(
-            onImageEditingComplete: _handleEditingComplete,
-            onCloseEditor: (_) async => await _handleEditingCancel(),
-          ),
-        );
+        editorWidget = ProImageEditor.network(imagePath, configs: currentConfigs, callbacks: ProImageEditorCallbacks(onImageEditingComplete: _handleEditingComplete, onCloseEditor: (_) async => await _handleEditingCancel()));
       } else if (imageSource == "file") {
-        editorWidget = ProImageEditor.file(
-          imagePath,
-          configs: _editorConfigs, // Use the state variable
-          callbacks: ProImageEditorCallbacks(
-            onImageEditingComplete: _handleEditingComplete,
-            onCloseEditor: (_) async => await _handleEditingCancel(),
-          ),
-        );
+        editorWidget = ProImageEditor.file(imagePath, configs: currentConfigs, callbacks: ProImageEditorCallbacks(onImageEditingComplete: _handleEditingComplete, onCloseEditor: (_) async => await _handleEditingCancel()));
       } else if (imageSource == "asset") {
-        editorWidget = ProImageEditor.asset(
-          imagePath,
-          configs: _editorConfigs, // Use the state variable
-          callbacks: ProImageEditorCallbacks(
-            onImageEditingComplete: _handleEditingComplete,
-            onCloseEditor: (_) async => await _handleEditingCancel(),
-          ),
-        );
+        editorWidget = ProImageEditor.asset(imagePath, configs: currentConfigs, callbacks: ProImageEditorCallbacks(onImageEditingComplete: _handleEditingComplete, onCloseEditor: (_) async => await _handleEditingCancel()));
       } else {
         return "error: Fuente de imagen no válida. Use 'network', 'file' o 'asset'";
       }
 
-      // Mostrar el editor en una nueva página
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => editorWidget),
-      );
-
+      await Navigator.push(context, MaterialPageRoute(builder: (context) => editorWidget));
       return "success";
     } catch (e) {
       debugPrint("Error al abrir el editor: $e");
-      setState(() {
-        _isEditing = false;
-      });
+      setState(() { _isEditing = false; });
       return "error: $e";
     }
   }
 
-  // Asegurarse de que los eventos se disparen con el nombre correcto
   Future<void> _handleEditingComplete(Uint8List editedImage) async {
-    // Primero disparamos el evento antes de cerrar el diálogo
     List<int> bytesList = editedImage.toList();
     String bytesString = bytesList.join(',');
-
-    // Disparar el evento con el nombre correcto
-    widget.backend.triggerControlEvent(
-        widget.control.id, "editing_complete", bytesString);
-
-    // Luego actualizamos el estado
-    setState(() {
-      _editedImage = editedImage;
-      _isEditing = false;
-    });
-
-    // Cerrar el diálogo si está abierto
+    widget.backend.triggerControlEvent(widget.control.id, "editing_complete", bytesString);
+    setState(() { _editedImage = editedImage; _isEditing = false; });
     if (_isOpen && context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
-      setState(() {
-        _isOpen = false;
-      });
+      setState(() { _isOpen = false; });
     }
   }
 
   Future<void> _handleEditingCancel() async {
-    // Primero disparamos el evento antes de cerrar el diálogo
     widget.backend.triggerControlEvent(widget.control.id, "editing_cancel", "");
-
-    // Luego actualizamos el estado
-    setState(() {
-      _isEditing = false;
-    });
-
-    // Cerrar el diálogo si está abierto
+    setState(() { _isEditing = false; });
     if (_isOpen && context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
-      setState(() {
-        _isOpen = false;
-      });
+      setState(() { _isOpen = false; });
     }
-
-    // Asegurarse de cerrar la página del editor si está abierta
     if (Navigator.of(context).canPop() && context.mounted) {
       Navigator.of(context).pop();
     }
   }
 
   Future<String?> _closeEditor() async {
-    // Cerrar la página del editor si está abierta
-    if (context.mounted && Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
-    }
-
-    // Cerrar el diálogo si está abierto
+    if (context.mounted && Navigator.of(context).canPop()) Navigator.of(context).pop();
     if (_isOpen && context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
-      setState(() {
-        _isOpen = false;
-      });
+      setState(() { _isOpen = false; });
     }
-
-    // Actualizar el estado local y limpiar la imagen editada
-    setState(() {
-      _isEditing = false;
-      _editedImage = null; // Asegurarse de limpiar la imagen editada
-    });
-
-    // Asegurar que los cambios de estado se apliquen completamente
+    setState(() { _isEditing = false; _editedImage = null; });
     await Future.delayed(Duration.zero);
-
     return "success";
   }
 
-  // Nota: Los métodos _parseAvailableOperations y _parseInitialOperation han sido eliminados
-  // ya que las propiedades availableOperations e initialOperation no están disponibles en la API actual
-
   @override
   Widget build(BuildContext context) {
-    // Este control no tiene representación visual directa
-
-    return const SizedBox.shrink(); // Control invisible
+    return const SizedBox.shrink();
   }
 }
