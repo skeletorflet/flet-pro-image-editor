@@ -1,4 +1,5 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
+import 'package:flutter/material.dart'; // For ThemeData
 import './progress_indicator_widgets.dart'; // Assuming this was created as a placeholder
 
 class ProgressIndicatorConfigs {
@@ -8,9 +9,9 @@ class ProgressIndicatorConfigs {
     this.widgets = const ProgressIndicatorWidgets(),
   });
 
-  factory ProgressIndicatorConfigs.fromJson(Map<String, dynamic> json) {
+  factory ProgressIndicatorConfigs.fromJson(ThemeData? theme, Map<String, dynamic> json) {
     return ProgressIndicatorConfigs(
-      widgets: json['widgets'] != null ? ProgressIndicatorWidgets.fromJson(utils.JsonUtils.parseMap(json['widgets'])) : const ProgressIndicatorWidgets(),
+      widgets: json['widgets'] != null ? ProgressIndicatorWidgets.fromJson(theme, json['widgets'] is Map ? Map<String, dynamic>.from(json['widgets'] as Map) : {}) : const ProgressIndicatorWidgets(),
     );
   }
 }

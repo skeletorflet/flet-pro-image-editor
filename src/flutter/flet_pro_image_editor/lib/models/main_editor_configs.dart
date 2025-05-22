@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; // For EdgeInsets, Curves
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 import './main_editor_style.dart';
 import './main_editor_icons.dart';
 import './main_editor_widgets.dart';
@@ -44,23 +44,34 @@ class MainEditorConfigs {
     this.safeArea = const EditorSafeArea(),
   });
 
-  factory MainEditorConfigs.fromJson(Map<String, dynamic> json) {
+  factory MainEditorConfigs.fromJson(ThemeData? theme, Map<String, dynamic> json) {
+    EdgeInsets tempBoundaryMargin = EdgeInsets.zero;
+    if (json['boundaryMargin'] is Map) {
+      final map = Map<String, dynamic>.from(json['boundaryMargin'] as Map);
+      tempBoundaryMargin = EdgeInsets.fromLTRB(
+        parseDouble(map['left'], 0.0),
+        parseDouble(map['top'], 0.0),
+        parseDouble(map['right'], 0.0),
+        parseDouble(map['bottom'], 0.0),
+      );
+    }
+
     return MainEditorConfigs(
-      enableZoom: utils.JsonUtils.parseBool(json['enableZoom'], false),
-      editorMinScale: utils.JsonUtils.parseDouble(json['editorMinScale'], 1.0),
-      editorMaxScale: utils.JsonUtils.parseDouble(json['editorMaxScale'], 5.0),
-      enableDoubleTapZoom: utils.JsonUtils.parseBool(json['enableDoubleTapZoom'], true),
-      doubleTapZoomFactor: utils.JsonUtils.parseDouble(json['doubleTapZoomFactor'], 2.0),
-      doubleTapZoomDuration: utils.JsonUtils.parseDuration(json['doubleTapZoomDuration'], const Duration(milliseconds: 180)),
-      doubleTapZoomCurve: utils.JsonUtils.parseCurve(json['doubleTapZoomCurve'] as String?, Curves.easeInOut),
-      boundaryMargin: utils.JsonUtils.parseEdgeInsets(utils.JsonUtils.parseMap(json['boundaryMargin']), EdgeInsets.zero),
-      transformSetup: json['transformSetup'] != null ? MainEditorTransformSetup.fromJson(utils.JsonUtils.parseMap(json['transformSetup'])) : const MainEditorTransformSetup(),
-      enableCloseButton: utils.JsonUtils.parseBool(json['enableCloseButton'], true),
-      enableEscapeButton: utils.JsonUtils.parseBool(json['enableEscapeButton'], true),
-      style: json['style'] != null ? MainEditorStyle.fromJson(utils.JsonUtils.parseMap(json['style'])) : const MainEditorStyle(),
-      icons: json['icons'] != null ? MainEditorIcons.fromJson(utils.JsonUtils.parseMap(json['icons'])) : const MainEditorIcons(),
-      widgets: json['widgets'] != null ? MainEditorWidgets.fromJson(utils.JsonUtils.parseMap(json['widgets'])) : const MainEditorWidgets(),
-      safeArea: json['safeArea'] != null ? EditorSafeArea.fromJson(utils.JsonUtils.parseMap(json['safeArea'])) : const EditorSafeArea(),
+      enableZoom: parseBool(json['enableZoom'], false),
+      editorMinScale: parseDouble(json['editorMinScale'], 1.0),
+      editorMaxScale: parseDouble(json['editorMaxScale'], 5.0),
+      enableDoubleTapZoom: parseBool(json['enableDoubleTapZoom'], true),
+      doubleTapZoomFactor: parseDouble(json['doubleTapZoomFactor'], 2.0),
+      doubleTapZoomDuration: parseAnimationDuration(json['doubleTapZoomDuration'], const Duration(milliseconds: 180)),
+      doubleTapZoomCurve: parseCurve(json['doubleTapZoomCurve'] as String?, Curves.easeInOut),
+      boundaryMargin: tempBoundaryMargin,
+      transformSetup: json['transformSetup'] != null ? MainEditorTransformSetup.fromJson(json['transformSetup'] is Map ? Map<String, dynamic>.from(json['transformSetup'] as Map) : {}) : const MainEditorTransformSetup(),
+      enableCloseButton: parseBool(json['enableCloseButton'], true),
+      enableEscapeButton: parseBool(json['enableEscapeButton'], true),
+      style: json['style'] != null ? MainEditorStyle.fromJson(theme, json['style'] is Map ? Map<String, dynamic>.from(json['style'] as Map) : {}) : const MainEditorStyle(),
+      icons: json['icons'] != null ? MainEditorIcons.fromJson(json['icons'] is Map ? Map<String, dynamic>.from(json['icons'] as Map) : {}) : const MainEditorIcons(),
+      widgets: json['widgets'] != null ? MainEditorWidgets.fromJson(json['widgets'] is Map ? Map<String, dynamic>.from(json['widgets'] as Map) : {}) : const MainEditorWidgets(),
+      safeArea: json['safeArea'] != null ? EditorSafeArea.fromJson(json['safeArea'] is Map ? Map<String, dynamic>.from(json['safeArea'] as Map) : {}) : const EditorSafeArea(),
     );
   }
 }

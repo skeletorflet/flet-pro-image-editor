@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; // For BlendMode
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class CensorConfigs {
   final double blurSigmaX;
@@ -38,10 +38,10 @@ class CensorConfigs {
 
   factory CensorConfigs.fromJson(Map<String, dynamic> json) {
     return CensorConfigs(
-      blurSigmaX: utils.JsonUtils.parseDouble(json['blurSigmaX'], 14.0),
-      blurSigmaY: utils.JsonUtils.parseDouble(json['blurSigmaY'], 14.0),
-      pixelBlockSize: utils.JsonUtils.parseDouble(json['pixelBlockSize'], 80.0),
-      enableRoundArea: utils.JsonUtils.parseBool(json['enableRoundArea'], false),
+      blurSigmaX: parseDouble(json['blurSigmaX'], 14.0),
+      blurSigmaY: parseDouble(json['blurSigmaY'], 14.0),
+      pixelBlockSize: parseDouble(json['pixelBlockSize'], 80.0),
+      enableRoundArea: parseBool(json['enableRoundArea'], false),
       blurBlendMode: _parseBlendMode(json['blurBlendMode'] as String?, BlendMode.srcOver),
       pixelateBlendMode: _parseBlendMode(json['pixelateBlendMode'] as String?, BlendMode.srcOver),
     );

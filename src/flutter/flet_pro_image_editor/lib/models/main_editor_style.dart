@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For SystemUiOverlayStyle
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 import './sub_editor_page_style.dart';
 
 class MainEditorStyle {
@@ -24,16 +24,34 @@ class MainEditorStyle {
     this.subEditorPage = const SubEditorPageStyle(),
   });
 
-  factory MainEditorStyle.fromJson(Map<String, dynamic> json) {
+  factory MainEditorStyle.fromJson(ThemeData? theme, Map<String, dynamic> json) {
+    SystemUiOverlayStyle tempUiOverlayStyle = SystemUiOverlayStyle.light; // Default
+    if (json['uiOverlayStyle'] is Map) {
+      final uiMap = Map<String, dynamic>.from(json['uiOverlayStyle'] as Map);
+      Brightness? parseBrightnessLocal(String? val) {
+        if (val == 'dark') return Brightness.dark;
+        if (val == 'light') return Brightness.light;
+        return null;
+      }
+      tempUiOverlayStyle = SystemUiOverlayStyle(
+        statusBarColor: uiMap['statusBarColor'] != null ? parseColor(theme, uiMap['statusBarColor'] as String?) : null,
+        statusBarBrightness: parseBrightnessLocal(uiMap['statusBarBrightness'] as String?),
+        statusBarIconBrightness: parseBrightnessLocal(uiMap['statusBarIconBrightness'] as String?),
+        systemNavigationBarColor: uiMap['systemNavigationBarColor'] != null ? parseColor(theme, uiMap['systemNavigationBarColor'] as String?) : null,
+        systemNavigationBarDividerColor: uiMap['systemNavigationBarDividerColor'] != null ? parseColor(theme, uiMap['systemNavigationBarDividerColor'] as String?) : null,
+        systemNavigationBarIconBrightness: parseBrightnessLocal(uiMap['systemNavigationBarIconBrightness'] as String?),
+      );
+    }
+
     return MainEditorStyle(
-      background: utils.JsonUtils.parseColor(json['background'], const Color(0xFF000000) /* kImageEditorBackground placeholder */),
-      bottomBarColor: utils.JsonUtils.parseColor(json['bottomBarColor'], const Color(0xFF333333) /* kImageEditorBottomBarColor placeholder */),
-      bottomBarBackground: utils.JsonUtils.parseColor(json['bottomBarBackground'], const Color(0xFF222222) /* kImageEditorBottomBarBackground placeholder */),
-      appBarColor: utils.JsonUtils.parseColor(json['appBarColor'], const Color(0xFF333333) /* kImageEditorAppBarColor placeholder */),
-      appBarBackground: utils.JsonUtils.parseColor(json['appBarBackground'], const Color(0xFF222222) /* kImageEditorAppBarBackground placeholder */),
-      uiOverlayStyle: utils.JsonUtils.parseSystemUiOverlayStyle(utils.JsonUtils.parseMap(json['uiOverlayStyle'])), // Uses default from JsonUtils if map is empty/null
-      outsideCaptureAreaLayerOpacity: utils.JsonUtils.parseDouble(json['outsideCaptureAreaLayerOpacity'], 0.5),
-      subEditorPage: json['subEditorPage'] != null ? SubEditorPageStyle.fromJson(utils.JsonUtils.parseMap(json['subEditorPage'])) : const SubEditorPageStyle(),
+      background: parseColor(theme, json['background'] as String?, const Color(0xFF000000) /* kImageEditorBackground placeholder */),
+      bottomBarColor: parseColor(theme, json['bottomBarColor'] as String?, const Color(0xFF333333) /* kImageEditorBottomBarColor placeholder */),
+      bottomBarBackground: parseColor(theme, json['bottomBarBackground'] as String?, const Color(0xFF222222) /* kImageEditorBottomBarBackground placeholder */),
+      appBarColor: parseColor(theme, json['appBarColor'] as String?, const Color(0xFF333333) /* kImageEditorAppBarColor placeholder */),
+      appBarBackground: parseColor(theme, json['appBarBackground'] as String?, const Color(0xFF222222) /* kImageEditorAppBarBackground placeholder */),
+      uiOverlayStyle: tempUiOverlayStyle,
+      outsideCaptureAreaLayerOpacity: parseDouble(json['outsideCaptureAreaLayerOpacity'], 0.5),
+      subEditorPage: json['subEditorPage'] != null ? SubEditorPageStyle.fromJson(theme, json['subEditorPage'] is Map ? Map<String, dynamic>.from(json['subEditorPage'] as Map) : {}) : const SubEditorPageStyle(),
     );
   }
 }

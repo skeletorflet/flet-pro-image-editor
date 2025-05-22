@@ -1,4 +1,4 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 // import 'package:flutter/material.dart'; // For Locale if used
 
 class CategoryEmoji {
@@ -13,10 +13,15 @@ class CategoryEmoji {
   });
 
   factory CategoryEmoji.fromJson(Map<String, dynamic> json) {
+    List<String> tempEmojis = [];
+    dynamic rawEmojis = json['emojis'];
+    if (rawEmojis is List) {
+      tempEmojis = rawEmojis.map((item) => parseString(item as String?, '')).toList().cast<String>();
+    }
     return CategoryEmoji(
-      category: utils.JsonUtils.parseString(json['category'], 'Default'),
-      emojis: utils.JsonUtils.parseList<String>(json['emojis'], (item) => utils.JsonUtils.parseString(item, ''), []),
-      // locale: json['locale'] != null ? Locale(utils.JsonUtils.parseString(json['locale'], 'en')) : null,
+      category: parseString(json['category'] as String?, 'Default'),
+      emojis: tempEmojis,
+      // locale: json['locale'] != null ? Locale(parseString(json['locale'] as String?, 'en')) : null,
     );
   }
 }

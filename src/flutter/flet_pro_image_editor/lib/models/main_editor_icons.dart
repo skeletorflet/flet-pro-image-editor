@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; // For default Icon names, if needed for reference
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class MainEditorIcons {
   final String closeEditor;
@@ -22,13 +22,13 @@ class MainEditorIcons {
 
   factory MainEditorIcons.fromJson(Map<String, dynamic> json) {
     return MainEditorIcons(
-      closeEditor: utils.JsonUtils.parseIconDataPlaceholder(json['closeEditor'], "Icons.clear"),
-      doneIcon: utils.JsonUtils.parseIconDataPlaceholder(json['doneIcon'], "Icons.done"),
-      applyChanges: utils.JsonUtils.parseIconDataPlaceholder(json['applyChanges'], "Icons.done"),
-      backButton: utils.JsonUtils.parseIconDataPlaceholder(json['backButton'], "Icons.arrow_back"),
-      undoAction: utils.JsonUtils.parseIconDataPlaceholder(json['undoAction'], "Icons.undo"),
-      redoAction: utils.JsonUtils.parseIconDataPlaceholder(json['redoAction'], "Icons.redo"),
-      removeElementZone: utils.JsonUtils.parseIconDataPlaceholder(json['removeElementZone'], "Icons.delete_outline_rounded"),
+      closeEditor: json['closeEditor'] as String? ?? "Icons.clear",
+      doneIcon: json['doneIcon'] as String? ?? "Icons.done",
+      applyChanges: json['applyChanges'] as String? ?? "Icons.done",
+      backButton: json['backButton'] as String? ?? "Icons.arrow_back",
+      undoAction: json['undoAction'] as String? ?? "Icons.undo",
+      redoAction: json['redoAction'] as String? ?? "Icons.redo",
+      removeElementZone: json['removeElementZone'] as String? ?? "Icons.delete_outline_rounded",
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; // For default Icon names, if needed for reference
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class PaintEditorIcons {
   final String moveAndZoom;
@@ -46,25 +46,25 @@ class PaintEditorIcons {
 
   factory PaintEditorIcons.fromJson(Map<String, dynamic> json) {
     return PaintEditorIcons(
-      moveAndZoom: utils.JsonUtils.parseIconDataPlaceholder(json['moveAndZoom'], "Icons.pinch_outlined"),
-      changeOpacity: utils.JsonUtils.parseIconDataPlaceholder(json['changeOpacity'], "Icons.opacity_outlined"),
-      eraser: utils.JsonUtils.parseIconDataPlaceholder(json['eraser'], "Icons.delete_forever_outlined"),
-      bottomNavBar: utils.JsonUtils.parseIconDataPlaceholder(json['bottomNavBar'], "Icons.edit_outlined"),
-      lineWeight: utils.JsonUtils.parseIconDataPlaceholder(json['lineWeight'], "Icons.line_weight_rounded"),
-      freeStyle: utils.JsonUtils.parseIconDataPlaceholder(json['freeStyle'], "Icons.edit"),
-      arrow: utils.JsonUtils.parseIconDataPlaceholder(json['arrow'], "Icons.arrow_right_alt_outlined"),
-      line: utils.JsonUtils.parseIconDataPlaceholder(json['line'], "Icons.horizontal_rule"),
-      fill: utils.JsonUtils.parseIconDataPlaceholder(json['fill'], "Icons.format_color_fill"),
-      noFill: utils.JsonUtils.parseIconDataPlaceholder(json['noFill'], "Icons.format_color_reset"),
-      rectangle: utils.JsonUtils.parseIconDataPlaceholder(json['rectangle'], "Icons.crop_free"),
-      circle: utils.JsonUtils.parseIconDataPlaceholder(json['circle'], "Icons.lens_outlined"),
-      dashLine: utils.JsonUtils.parseIconDataPlaceholder(json['dashLine'], "Icons.power_input"),
-      pixelate: utils.JsonUtils.parseIconDataPlaceholder(json['pixelate'], "Icons.grid_on"),
-      blur: utils.JsonUtils.parseIconDataPlaceholder(json['blur'], "Icons.blur_on_rounded"),
-      applyChanges: utils.JsonUtils.parseIconDataPlaceholder(json['applyChanges'], "Icons.done"),
-      backButton: utils.JsonUtils.parseIconDataPlaceholder(json['backButton'], "Icons.arrow_back"),
-      undoAction: utils.JsonUtils.parseIconDataPlaceholder(json['undoAction'], "Icons.undo"),
-      redoAction: utils.JsonUtils.parseIconDataPlaceholder(json['redoAction'], "Icons.redo"),
+      moveAndZoom: json['moveAndZoom'] as String? ?? "Icons.pinch_outlined",
+      changeOpacity: json['changeOpacity'] as String? ?? "Icons.opacity_outlined",
+      eraser: json['eraser'] as String? ?? "Icons.delete_forever_outlined",
+      bottomNavBar: json['bottomNavBar'] as String? ?? "Icons.edit_outlined",
+      lineWeight: json['lineWeight'] as String? ?? "Icons.line_weight_rounded",
+      freeStyle: json['freeStyle'] as String? ?? "Icons.edit",
+      arrow: json['arrow'] as String? ?? "Icons.arrow_right_alt_outlined",
+      line: json['line'] as String? ?? "Icons.horizontal_rule",
+      fill: json['fill'] as String? ?? "Icons.format_color_fill",
+      noFill: json['noFill'] as String? ?? "Icons.format_color_reset",
+      rectangle: json['rectangle'] as String? ?? "Icons.crop_free",
+      circle: json['circle'] as String? ?? "Icons.lens_outlined",
+      dashLine: json['dashLine'] as String? ?? "Icons.power_input",
+      pixelate: json['pixelate'] as String? ?? "Icons.grid_on",
+      blur: json['blur'] as String? ?? "Icons.blur_on_rounded",
+      applyChanges: json['applyChanges'] as String? ?? "Icons.done",
+      backButton: json['backButton'] as String? ?? "Icons.arrow_back",
+      undoAction: json['undoAction'] as String? ?? "Icons.undo",
+      redoAction: json['redoAction'] as String? ?? "Icons.redo",
     );
   }
 }

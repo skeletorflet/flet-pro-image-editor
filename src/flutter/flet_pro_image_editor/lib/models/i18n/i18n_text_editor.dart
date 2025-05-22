@@ -1,4 +1,4 @@
-import '../../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class I18nTextEditor {
   final String inputHintText;
@@ -23,14 +23,14 @@ class I18nTextEditor {
 
   factory I18nTextEditor.fromJson(Map<String, dynamic> json) {
     return I18nTextEditor(
-      inputHintText: utils.JsonUtils.parseString(json['inputHintText'], 'Enter text'),
-      bottomNavigationBarText: utils.JsonUtils.parseString(json['bottomNavigationBarText'], 'Text'),
-      back: utils.JsonUtils.parseString(json['back'], 'Back'),
-      done: utils.JsonUtils.parseString(json['done'], 'Done'),
-      textAlign: utils.JsonUtils.parseString(json['textAlign'], 'Align text'),
-      fontScale: utils.JsonUtils.parseString(json['fontScale'], 'Font scale'),
-      backgroundMode: utils.JsonUtils.parseString(json['backgroundMode'], 'Background mode'),
-      smallScreenMoreTooltip: utils.JsonUtils.parseString(json['smallScreenMoreTooltip'], 'More'),
+      inputHintText: parseString(json['inputHintText'] as String?, 'Enter text'),
+      bottomNavigationBarText: parseString(json['bottomNavigationBarText'] as String?, 'Text'),
+      back: parseString(json['back'] as String?, 'Back'),
+      done: parseString(json['done'] as String?, 'Done'),
+      textAlign: parseString(json['textAlign'] as String?, 'Align text'),
+      fontScale: parseString(json['fontScale'] as String?, 'Font scale'),
+      backgroundMode: parseString(json['backgroundMode'] as String?, 'Background mode'),
+      smallScreenMoreTooltip: parseString(json['smallScreenMoreTooltip'] as String?, 'More'),
     );
   }
 }

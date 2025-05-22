@@ -1,4 +1,4 @@
-import '../../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class I18nCropRotateEditor {
   final String bottomNavigationBarText;
@@ -29,17 +29,17 @@ class I18nCropRotateEditor {
 
   factory I18nCropRotateEditor.fromJson(Map<String, dynamic> json) {
     return I18nCropRotateEditor(
-      bottomNavigationBarText: utils.JsonUtils.parseString(json['bottomNavigationBarText'], 'Crop/ Rotate'),
-      rotate: utils.JsonUtils.parseString(json['rotate'], 'Rotate'),
-      flip: utils.JsonUtils.parseString(json['flip'], 'Flip'),
-      ratio: utils.JsonUtils.parseString(json['ratio'], 'Ratio'),
-      back: utils.JsonUtils.parseString(json['back'], 'Back'),
-      done: utils.JsonUtils.parseString(json['done'], 'Done'),
-      cancel: utils.JsonUtils.parseString(json['cancel'], 'Cancel'),
-      undo: utils.JsonUtils.parseString(json['undo'], 'Undo'),
-      redo: utils.JsonUtils.parseString(json['redo'], 'Redo'),
-      smallScreenMoreTooltip: utils.JsonUtils.parseString(json['smallScreenMoreTooltip'], 'More'),
-      reset: utils.JsonUtils.parseString(json['reset'], 'Reset'),
+      bottomNavigationBarText: parseString(json['bottomNavigationBarText'] as String?, 'Crop/ Rotate'),
+      rotate: parseString(json['rotate'] as String?, 'Rotate'),
+      flip: parseString(json['flip'] as String?, 'Flip'),
+      ratio: parseString(json['ratio'] as String?, 'Ratio'),
+      back: parseString(json['back'] as String?, 'Back'),
+      done: parseString(json['done'] as String?, 'Done'),
+      cancel: parseString(json['cancel'] as String?, 'Cancel'),
+      undo: parseString(json['undo'] as String?, 'Undo'),
+      redo: parseString(json['redo'] as String?, 'Redo'),
+      smallScreenMoreTooltip: parseString(json['smallScreenMoreTooltip'] as String?, 'More'),
+      reset: parseString(json['reset'] as String?, 'Reset'),
     );
   }
 }

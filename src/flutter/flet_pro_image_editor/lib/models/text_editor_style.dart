@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; // For Color, TextStyle, EdgeInsets
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class TextEditorStyle {
   final TextStyle? fontSizeBottomSheetTitle;
@@ -26,18 +26,41 @@ class TextEditorStyle {
     this.fontScaleBottomSheetBackground = const Color(0xFF252728),
   });
 
-  factory TextEditorStyle.fromJson(Map<String, dynamic> json) {
+  factory TextEditorStyle.fromJson(ThemeData? theme, Map<String, dynamic> json) {
+    TextStyle? parseTextStyleLocal(ThemeData? currentTheme, dynamic map) {
+      if (map is Map) {
+        final m = Map<String, dynamic>.from(map);
+        return TextStyle(
+          color: m['color'] != null ? parseColor(currentTheme, m['color'] as String?) : null,
+          fontFamily: m['fontFamily'] as String?,
+          fontSize: m['fontSize'] != null ? parseDouble(m['fontSize'], 14.0) : null,
+        );
+      }
+      return null;
+    }
+
+    EdgeInsets tempTextFieldMargin = const EdgeInsets.only(bottom: 56.0);
+    if (json['textFieldMargin'] is Map) {
+      final map = Map<String, dynamic>.from(json['textFieldMargin'] as Map);
+      tempTextFieldMargin = EdgeInsets.fromLTRB(
+        parseDouble(map['left'], 0.0),
+        parseDouble(map['top'], 0.0),
+        parseDouble(map['right'], 0.0),
+        parseDouble(map['bottom'], 0.0),
+      );
+    }
+
     return TextEditorStyle(
-      fontSizeBottomSheetTitle: utils.JsonUtils.parseTextStyle(utils.JsonUtils.parseMap(json['fontSizeBottomSheetTitle'])),
-      textFieldMargin: utils.JsonUtils.parseEdgeInsets(utils.JsonUtils.parseMap(json['textFieldMargin']), const EdgeInsets.only(bottom: 56.0)),
-      appBarBackground: utils.JsonUtils.parseColor(json['appBarBackground'], const Color(0xFF222222)),
-      appBarColor: utils.JsonUtils.parseColor(json['appBarColor'], const Color(0xFFFFFFFF)),
-      bottomBarBackground: utils.JsonUtils.parseColor(json['bottomBarBackground'], const Color(0xFF222222)),
-      background: utils.JsonUtils.parseColor(json['background'], const Color(0x9B000000)),
-      bottomBarMainAxisAlignment: utils.JsonUtils.parseString(json['bottomBarMainAxisAlignment'], 'spaceEvenly'),
-      inputHintColor: utils.JsonUtils.parseColor(json['inputHintColor'], const Color(0xFFBDBDBD)),
-      inputCursorColor: utils.JsonUtils.parseColor(json['inputCursorColor'], Colors.blue),
-      fontScaleBottomSheetBackground: utils.JsonUtils.parseColor(json['fontScaleBottomSheetBackground'], const Color(0xFF252728)),
+      fontSizeBottomSheetTitle: parseTextStyleLocal(theme, json['fontSizeBottomSheetTitle']),
+      textFieldMargin: tempTextFieldMargin,
+      appBarBackground: parseColor(theme, json['appBarBackground'] as String?, const Color(0xFF222222)),
+      appBarColor: parseColor(theme, json['appBarColor'] as String?, const Color(0xFFFFFFFF)),
+      bottomBarBackground: parseColor(theme, json['bottomBarBackground'] as String?, const Color(0xFF222222)),
+      background: parseColor(theme, json['background'] as String?, const Color(0x9B000000)),
+      bottomBarMainAxisAlignment: parseString(json['bottomBarMainAxisAlignment'] as String?, 'spaceEvenly'),
+      inputHintColor: parseColor(theme, json['inputHintColor'] as String?, const Color(0xFFBDBDBD)),
+      inputCursorColor: parseColor(theme, json['inputCursorColor'] as String?, Colors.blue),
+      fontScaleBottomSheetBackground: parseColor(theme, json['fontScaleBottomSheetBackground'] as String?, const Color(0xFF252728)),
     );
   }
 }

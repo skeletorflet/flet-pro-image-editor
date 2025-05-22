@@ -1,4 +1,4 @@
-import '../../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class I18nPaintEditor {
   final String moveAndZoom;
@@ -45,25 +45,25 @@ class I18nPaintEditor {
 
   factory I18nPaintEditor.fromJson(Map<String, dynamic> json) {
     return I18nPaintEditor(
-      moveAndZoom: utils.JsonUtils.parseString(json['moveAndZoom'], 'Zoom'),
-      bottomNavigationBarText: utils.JsonUtils.parseString(json['bottomNavigationBarText'], 'Paint'),
-      freestyle: utils.JsonUtils.parseString(json['freestyle'], 'Freestyle'),
-      arrow: utils.JsonUtils.parseString(json['arrow'], 'Arrow'),
-      line: utils.JsonUtils.parseString(json['line'], 'Line'),
-      rectangle: utils.JsonUtils.parseString(json['rectangle'], 'Rectangle'),
-      circle: utils.JsonUtils.parseString(json['circle'], 'Circle'),
-      dashLine: utils.JsonUtils.parseString(json['dashLine'], 'Dash line'),
-      blur: utils.JsonUtils.parseString(json['blur'], 'Blur'),
-      pixelate: utils.JsonUtils.parseString(json['pixelate'], 'Pixelate'),
-      lineWidth: utils.JsonUtils.parseString(json['lineWidth'], 'Line width'),
-      eraser: utils.JsonUtils.parseString(json['eraser'], 'Eraser'),
-      toggleFill: utils.JsonUtils.parseString(json['toggleFill'], 'Toggle fill'),
-      changeOpacity: utils.JsonUtils.parseString(json['changeOpacity'], 'Change opacity'),
-      undo: utils.JsonUtils.parseString(json['undo'], 'Undo'),
-      redo: utils.JsonUtils.parseString(json['redo'], 'Redo'),
-      done: utils.JsonUtils.parseString(json['done'], 'Done'),
-      back: utils.JsonUtils.parseString(json['back'], 'Back'),
-      smallScreenMoreTooltip: utils.JsonUtils.parseString(json['smallScreenMoreTooltip'], 'More'),
+      moveAndZoom: parseString(json['moveAndZoom'] as String?, 'Zoom'),
+      bottomNavigationBarText: parseString(json['bottomNavigationBarText'] as String?, 'Paint'),
+      freestyle: parseString(json['freestyle'] as String?, 'Freestyle'),
+      arrow: parseString(json['arrow'] as String?, 'Arrow'),
+      line: parseString(json['line'] as String?, 'Line'),
+      rectangle: parseString(json['rectangle'] as String?, 'Rectangle'),
+      circle: parseString(json['circle'] as String?, 'Circle'),
+      dashLine: parseString(json['dashLine'] as String?, 'Dash line'),
+      blur: parseString(json['blur'] as String?, 'Blur'),
+      pixelate: parseString(json['pixelate'] as String?, 'Pixelate'),
+      lineWidth: parseString(json['lineWidth'] as String?, 'Line width'),
+      eraser: parseString(json['eraser'] as String?, 'Eraser'),
+      toggleFill: parseString(json['toggleFill'] as String?, 'Toggle fill'),
+      changeOpacity: parseString(json['changeOpacity'] as String?, 'Change opacity'),
+      undo: parseString(json['undo'] as String?, 'Undo'),
+      redo: parseString(json['redo'] as String?, 'Redo'),
+      done: parseString(json['done'] as String?, 'Done'),
+      back: parseString(json['back'] as String?, 'Back'),
+      smallScreenMoreTooltip: parseString(json['smallScreenMoreTooltip'] as String?, 'More'),
     );
   }
 }

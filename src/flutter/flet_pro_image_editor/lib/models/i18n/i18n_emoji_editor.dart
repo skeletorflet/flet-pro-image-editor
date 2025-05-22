@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; // For Locale
-import '../../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class I18nEmojiEditor {
   final String bottomNavigationBarText;
@@ -34,19 +34,19 @@ class I18nEmojiEditor {
 
   factory I18nEmojiEditor.fromJson(Map<String, dynamic> json) {
     return I18nEmojiEditor(
-      bottomNavigationBarText: utils.JsonUtils.parseString(json['bottomNavigationBarText'], 'Emoji'),
-      search: utils.JsonUtils.parseString(json['search'], 'Search'),
-      categoryRecent: utils.JsonUtils.parseString(json['categoryRecent'], 'Recent'),
-      categorySmileys: utils.JsonUtils.parseString(json['categorySmileys'], 'Smileys & People'),
-      categoryAnimals: utils.JsonUtils.parseString(json['categoryAnimals'], 'Animals & Nature'),
-      categoryFood: utils.JsonUtils.parseString(json['categoryFood'], 'Food & Drink'),
-      categoryActivities: utils.JsonUtils.parseString(json['categoryActivities'], 'Activities'),
-      categoryTravel: utils.JsonUtils.parseString(json['categoryTravel'], 'Travel & Places'),
-      categoryObjects: utils.JsonUtils.parseString(json['categoryObjects'], 'Objects'),
-      categorySymbols: utils.JsonUtils.parseString(json['categorySymbols'], 'Symbols'),
-      categoryFlags: utils.JsonUtils.parseString(json['categoryFlags'], 'Flags'),
-      enableSearchAutoI18n: utils.JsonUtils.parseBool(json['enableSearchAutoI18n'], false),
-      locale: json['locale'] != null ? Locale(utils.JsonUtils.parseString(json['locale'], 'en')) : null,
+      bottomNavigationBarText: parseString(json['bottomNavigationBarText'] as String?, 'Emoji'),
+      search: parseString(json['search'] as String?, 'Search'),
+      categoryRecent: parseString(json['categoryRecent'] as String?, 'Recent'),
+      categorySmileys: parseString(json['categorySmileys'] as String?, 'Smileys & People'),
+      categoryAnimals: parseString(json['categoryAnimals'] as String?, 'Animals & Nature'),
+      categoryFood: parseString(json['categoryFood'] as String?, 'Food & Drink'),
+      categoryActivities: parseString(json['categoryActivities'] as String?, 'Activities'),
+      categoryTravel: parseString(json['categoryTravel'] as String?, 'Travel & Places'),
+      categoryObjects: parseString(json['categoryObjects'] as String?, 'Objects'),
+      categorySymbols: parseString(json['categorySymbols'] as String?, 'Symbols'),
+      categoryFlags: parseString(json['categoryFlags'] as String?, 'Flags'),
+      enableSearchAutoI18n: parseBool(json['enableSearchAutoI18n'], false),
+      locale: json['locale'] != null ? Locale(parseString(json['locale'] as String?, 'en')) : null,
     );
   }
 }

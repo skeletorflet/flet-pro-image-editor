@@ -1,4 +1,5 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
+import 'package:flutter/material.dart'; // For ThemeData
 import './helper_line_style.dart';
 
 class HelperLineConfigs {
@@ -14,12 +15,12 @@ class HelperLineConfigs {
     this.style = const HelperLineStyle(),
   });
 
-  factory HelperLineConfigs.fromJson(Map<String, dynamic> json) {
+  factory HelperLineConfigs.fromJson(ThemeData? theme, Map<String, dynamic> json) {
     return HelperLineConfigs(
-      showVerticalLine: utils.JsonUtils.parseBool(json['showVerticalLine'], true),
-      showHorizontalLine: utils.JsonUtils.parseBool(json['showHorizontalLine'], true),
-      showRotateLine: utils.JsonUtils.parseBool(json['showRotateLine'], true),
-      style: json['style'] != null ? HelperLineStyle.fromJson(utils.JsonUtils.parseMap(json['style'])) : const HelperLineStyle(),
+      showVerticalLine: parseBool(json['showVerticalLine'], true),
+      showHorizontalLine: parseBool(json['showHorizontalLine'], true),
+      showRotateLine: parseBool(json['showRotateLine'], true),
+      style: json['style'] != null ? HelperLineStyle.fromJson(theme, json['style'] is Map ? Map<String, dynamic>.from(json['style'] as Map) : {}) : const HelperLineStyle(),
     );
   }
 }

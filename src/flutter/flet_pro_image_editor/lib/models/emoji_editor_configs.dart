@@ -1,4 +1,5 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
+import 'package:flutter/material.dart'; // For ThemeData
 import './category_emoji.dart';
 import './emoji_editor_style.dart'; // Assuming this was created as a placeholder
 import './emoji_editor_icons.dart'; // Assuming this was created as a placeholder
@@ -26,17 +27,25 @@ class EmojiEditorConfigs {
     this.icons = const EmojiEditorIcons(),
   });
 
-  factory EmojiEditorConfigs.fromJson(Map<String, dynamic> json) {
+  factory EmojiEditorConfigs.fromJson(ThemeData? theme, Map<String, dynamic> json) {
+    List<CategoryEmoji> tempEmojiSet = const [];
+    dynamic rawEmojiSet = json['emojiSet'];
+    if (rawEmojiSet is List) {
+      tempEmojiSet = rawEmojiSet.map((item) {
+        return CategoryEmoji.fromJson(item is Map ? Map<String, dynamic>.from(item) : {});
+      }).toList().cast<CategoryEmoji>();
+    }
+
     return EmojiEditorConfigs(
-      enabled: utils.JsonUtils.parseBool(json['enabled'], true),
-      enablePreloadWebFont: utils.JsonUtils.parseBool(json['enablePreloadWebFont'], true),
-      initScale: utils.JsonUtils.parseDouble(json['initScale'], 5.0),
-      minScale: utils.JsonUtils.parseDouble(json['minScale'], double.negativeInfinity),
-      maxScale: utils.JsonUtils.parseDouble(json['maxScale'], double.infinity),
-      checkPlatformCompatibility: utils.JsonUtils.parseBool(json['checkPlatformCompatibility'], true),
-      emojiSet: utils.JsonUtils.parseList<CategoryEmoji>(json['emojiSet'], (item) => CategoryEmoji.fromJson(utils.JsonUtils.parseMap(item)), []),
-      style: json['style'] != null ? EmojiEditorStyle.fromJson(utils.JsonUtils.parseMap(json['style'])) : const EmojiEditorStyle(),
-      icons: json['icons'] != null ? EmojiEditorIcons.fromJson(utils.JsonUtils.parseMap(json['icons'])) : const EmojiEditorIcons(),
+      enabled: parseBool(json['enabled'], true),
+      enablePreloadWebFont: parseBool(json['enablePreloadWebFont'], true),
+      initScale: parseDouble(json['initScale'], 5.0),
+      minScale: parseDouble(json['minScale'], double.negativeInfinity),
+      maxScale: parseDouble(json['maxScale'], double.infinity),
+      checkPlatformCompatibility: parseBool(json['checkPlatformCompatibility'], true),
+      emojiSet: tempEmojiSet,
+      style: json['style'] != null ? EmojiEditorStyle.fromJson(theme, json['style'] is Map ? Map<String, dynamic>.from(json['style'] as Map) : {}) : const EmojiEditorStyle(),
+      icons: json['icons'] != null ? EmojiEditorIcons.fromJson(json['icons'] is Map ? Map<String, dynamic>.from(json['icons'] as Map) : {}) : const EmojiEditorIcons(),
     );
   }
 }

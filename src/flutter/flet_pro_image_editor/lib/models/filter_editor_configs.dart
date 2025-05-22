@@ -1,10 +1,10 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
+import 'package:flutter/material.dart'; // For ThemeData and Duration
 import './filter_model.dart';
 import './editor_safe_area.dart';
 import './filter_editor_style.dart'; // Assuming this was created as a placeholder
 import './filter_editor_icons.dart'; // Assuming this was created as a placeholder
 import './filter_editor_widgets.dart'; // Assuming this was created as a placeholder
-// For Duration, if used directly, import 'package:flutter/material.dart';
 
 class FilterEditorConfigs {
   final bool enabled;
@@ -29,17 +29,25 @@ class FilterEditorConfigs {
     this.widgets = const FilterEditorWidgets(),
   });
 
-  factory FilterEditorConfigs.fromJson(Map<String, dynamic> json) {
+  factory FilterEditorConfigs.fromJson(ThemeData? theme, Map<String, dynamic> json) {
+    List<FilterModel> tempFilterList = const [];
+    dynamic rawFilterList = json['filterList'];
+    if (rawFilterList is List) {
+      tempFilterList = rawFilterList.map((item) {
+        return FilterModel.fromJson(item is Map ? Map<String, dynamic>.from(item as Map) : {});
+      }).toList().cast<FilterModel>();
+    }
+
     return FilterEditorConfigs(
-      enabled: utils.JsonUtils.parseBool(json['enabled'], true),
-      showLayers: utils.JsonUtils.parseBool(json['showLayers'], true),
-      filterList: utils.JsonUtils.parseList<FilterModel>(json['filterList'], (item) => FilterModel.fromJson(utils.JsonUtils.parseMap(item)), []),
-      safeArea: json['safeArea'] != null ? EditorSafeArea.fromJson(utils.JsonUtils.parseMap(json['safeArea'])) : const EditorSafeArea(),
-      fadeInUpDuration: utils.JsonUtils.parseDuration(json['fadeInUpDuration'], const Duration(milliseconds: 220)),
-      fadeInUpStaggerDelayDuration: utils.JsonUtils.parseDuration(json['fadeInUpStaggerDelayDuration'], const Duration(milliseconds: 25)),
-      style: json['style'] != null ? FilterEditorStyle.fromJson(utils.JsonUtils.parseMap(json['style'])) : const FilterEditorStyle(),
-      icons: json['icons'] != null ? FilterEditorIcons.fromJson(utils.JsonUtils.parseMap(json['icons'])) : const FilterEditorIcons(),
-      widgets: json['widgets'] != null ? FilterEditorWidgets.fromJson(utils.JsonUtils.parseMap(json['widgets'])) : const FilterEditorWidgets(),
+      enabled: parseBool(json['enabled'], true),
+      showLayers: parseBool(json['showLayers'], true),
+      filterList: tempFilterList,
+      safeArea: json['safeArea'] != null ? EditorSafeArea.fromJson(json['safeArea'] is Map ? Map<String, dynamic>.from(json['safeArea'] as Map) : {}) : const EditorSafeArea(),
+      fadeInUpDuration: parseAnimationDuration(json['fadeInUpDuration'], const Duration(milliseconds: 220)),
+      fadeInUpStaggerDelayDuration: parseAnimationDuration(json['fadeInUpStaggerDelayDuration'], const Duration(milliseconds: 25)),
+      style: json['style'] != null ? FilterEditorStyle.fromJson(theme, json['style'] is Map ? Map<String, dynamic>.from(json['style'] as Map) : {}) : const FilterEditorStyle(),
+      icons: json['icons'] != null ? FilterEditorIcons.fromJson(json['icons'] is Map ? Map<String, dynamic>.from(json['icons'] as Map) : {}) : const FilterEditorIcons(),
+      widgets: json['widgets'] != null ? FilterEditorWidgets.fromJson(json['widgets'] is Map ? Map<String, dynamic>.from(json['widgets'] as Map) : {}) : const FilterEditorWidgets(),
     );
   }
 }

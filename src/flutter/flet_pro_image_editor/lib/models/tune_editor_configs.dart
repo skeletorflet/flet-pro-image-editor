@@ -1,4 +1,5 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
+import 'package:flutter/material.dart'; // For ThemeData
 // Import other necessary models if they become non-placeholders
 // e.g., TuneEditorStyle, TuneEditorIcons, TuneEditorWidgets
 
@@ -16,12 +17,12 @@ class TuneEditorConfigs {
     // this.widgets = const TuneEditorWidgets(), // If widgets is a class
   });
 
-  factory TuneEditorConfigs.fromJson(Map<String, dynamic> json) {
+  factory TuneEditorConfigs.fromJson(ThemeData? theme, Map<String, dynamic> json) {
     return TuneEditorConfigs(
-      enabled: utils.JsonUtils.parseBool(json['enabled'], true),
-      // style: json['style'] != null ? TuneEditorStyle.fromJson(utils.JsonUtils.parseMap(json['style'])) : const TuneEditorStyle(),
-      // icons: json['icons'] != null ? TuneEditorIcons.fromJson(utils.JsonUtils.parseMap(json['icons'])) : const TuneEditorIcons(),
-      // widgets: json['widgets'] != null ? TuneEditorWidgets.fromJson(utils.JsonUtils.parseMap(json['widgets'])) : const TuneEditorWidgets(),
+      enabled: parseBool(json['enabled'], true),
+      // style: json['style'] != null ? TuneEditorStyle.fromJson(theme, json['style'] is Map ? Map<String, dynamic>.from(json['style'] as Map) : {}) : const TuneEditorStyle(),
+      // icons: json['icons'] != null ? TuneEditorIcons.fromJson(json['icons'] is Map ? Map<String, dynamic>.from(json['icons'] as Map) : {}) : const TuneEditorIcons(),
+      // widgets: json['widgets'] != null ? TuneEditorWidgets.fromJson(theme, json['widgets'] is Map ? Map<String, dynamic>.from(json['widgets'] as Map) : {}) : const TuneEditorWidgets(),
     );
   }
 }

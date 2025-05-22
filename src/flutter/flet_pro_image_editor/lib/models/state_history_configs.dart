@@ -1,4 +1,4 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 import './import_state_history.dart'; // Placeholder
 
 class StateHistoryConfigs {
@@ -12,9 +12,9 @@ class StateHistoryConfigs {
 
   factory StateHistoryConfigs.fromJson(Map<String, dynamic> json) {
     return StateHistoryConfigs(
-      stateHistoryLimit: utils.JsonUtils.parseInt(json['stateHistoryLimit'], 1000),
+      stateHistoryLimit: parseInt(json['stateHistoryLimit'], 1000),
       initStateHistory: json['initStateHistory'] != null
-          ? ImportStateHistory.fromJson(utils.JsonUtils.parseMap(json['initStateHistory']))
+          ? ImportStateHistory.fromJson(json['initStateHistory'] is Map ? Map<String, dynamic>.from(json['initStateHistory'] as Map) : {})
           : null, // If it's not provided, keep it null
     );
   }

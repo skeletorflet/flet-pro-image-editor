@@ -1,9 +1,12 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
+import 'package:flutter/material.dart';
 
 class FilterEditorStyle {
   const FilterEditorStyle();
 
-  factory FilterEditorStyle.fromJson(Map<String, dynamic> json) {
+  factory FilterEditorStyle.fromJson(ThemeData? theme, Map<String, dynamic> json) {
+    // Example property:
+    // final Color? someColor = json['someColor'] != null ? parseColor(theme, json['someColor'] as String?) : null;
     return const FilterEditorStyle();
   }
 }

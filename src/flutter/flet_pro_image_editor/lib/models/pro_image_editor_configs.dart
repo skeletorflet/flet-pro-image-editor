@@ -1,4 +1,4 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 import './i18n/i18n.dart';
 import './main_editor_configs.dart';
 import './paint_editor_configs.dart';
@@ -21,21 +21,8 @@ import 'package:flutter/material.dart'; // For Color, used in ThemeData placehol
 // Ensure ImageEditorDesignMode enum is also in this file or correctly imported
 enum ImageEditorDesignMode { material, cupertino }
 
-// Ensure placeholder ThemeData is also in this file or correctly imported
-class ThemeData {
-  final Color? primaryColor; // Example field for parsing
-  const ThemeData({this.primaryColor});
-
-  factory ThemeData.fromJson(Map<String,dynamic> json) {
-    // Example parsing for a potential 'primary_color' key
-    return ThemeData(
-      primaryColor: json.containsKey('primary_color') ? utils.JsonUtils.parseColor(json['primary_color']) : null
-    );
-  }
-}
-
 class ProImageEditorConfigs {
-  final ThemeData? theme;
+  final ThemeData? theme; // This will be populated by the theme from Flet context
   final String heroTag;
   final I18n i18n;
   final MainEditorConfigs mainEditor;
@@ -79,34 +66,39 @@ class ProImageEditorConfigs {
     this.designMode = ImageEditorDesignMode.material,
   });
 
-  factory ProImageEditorConfigs.fromJson(Map<String, dynamic> json) {
-    ThemeData? parsedTheme;
-    if (json['theme'] != null && json['theme'] is Map && (json['theme'] as Map).isNotEmpty) {
-      // Ensure ThemeData itself has a fromJson and is imported
-      parsedTheme = ThemeData.fromJson(utils.JsonUtils.parseMap(json['theme']));
+  factory ProImageEditorConfigs.fromJson(ThemeData? theme, Map<String, dynamic> json) {
+    ImageEditorDesignMode tempDesignMode = ImageEditorDesignMode.material;
+    dynamic rawDesignMode = json['designMode'];
+    if (rawDesignMode is String) {
+      tempDesignMode = ImageEditorDesignMode.values.firstWhere(
+        (e) => e.toString().split('.').last.toLowerCase() == rawDesignMode.toLowerCase(),
+        orElse: () => ImageEditorDesignMode.material
+      );
+    } else if (ImageEditorDesignMode.values.contains(rawDesignMode)) {
+      tempDesignMode = rawDesignMode;
     }
 
     return ProImageEditorConfigs(
-      theme: parsedTheme,
-      heroTag: utils.JsonUtils.parseString(json['heroTag'], 'Pro-Image-Editor-Hero'),
-      i18n: json['i18n'] != null ? I18n.fromJson(utils.JsonUtils.parseMap(json['i18n'])) : const I18n(),
-      mainEditor: json['mainEditor'] != null ? MainEditorConfigs.fromJson(utils.JsonUtils.parseMap(json['mainEditor'])) : const MainEditorConfigs(),
-      paintEditor: json['paintEditor'] != null ? PaintEditorConfigs.fromJson(utils.JsonUtils.parseMap(json['paintEditor'])) : const PaintEditorConfigs(),
-      textEditor: json['textEditor'] != null ? TextEditorConfigs.fromJson(utils.JsonUtils.parseMap(json['textEditor'])) : const TextEditorConfigs(),
-      cropRotateEditor: json['cropRotateEditor'] != null ? CropRotateEditorConfigs.fromJson(utils.JsonUtils.parseMap(json['cropRotateEditor'])) : const CropRotateEditorConfigs(),
-      filterEditor: json['filterEditor'] != null ? FilterEditorConfigs.fromJson(utils.JsonUtils.parseMap(json['filterEditor'])) : const FilterEditorConfigs(),
-      tuneEditor: json['tuneEditor'] != null ? TuneEditorConfigs.fromJson(utils.JsonUtils.parseMap(json['tuneEditor'])) : const TuneEditorConfigs(),
-      blurEditor: json['blurEditor'] != null ? BlurEditorConfigs.fromJson(utils.JsonUtils.parseMap(json['blurEditor'])) : const BlurEditorConfigs(),
-      emojiEditor: json['emojiEditor'] != null ? EmojiEditorConfigs.fromJson(utils.JsonUtils.parseMap(json['emojiEditor'])) : const EmojiEditorConfigs(),
-      stickerEditor: json['stickerEditor'] != null ? StickerEditorConfigs.fromJson(utils.JsonUtils.parseMap(json['stickerEditor'])) : const StickerEditorConfigs(),
-      stateHistory: json['stateHistory'] != null ? StateHistoryConfigs.fromJson(utils.JsonUtils.parseMap(json['stateHistory'])) : const StateHistoryConfigs(),
-      imageGeneration: json['imageGeneration'] != null ? ImageGenerationConfigs.fromJson(utils.JsonUtils.parseMap(json['imageGeneration'])) : const ImageGenerationConfigs(),
-      helperLines: json['helperLines'] != null ? HelperLineConfigs.fromJson(utils.JsonUtils.parseMap(json['helperLines'])) : const HelperLineConfigs(),
-      layerInteraction: json['layerInteraction'] != null ? LayerInteractionConfigs.fromJson(utils.JsonUtils.parseMap(json['layerInteraction'])) : const LayerInteractionConfigs(),
-      dialogConfigs: json['dialogConfigs'] != null ? DialogConfigs.fromJson(utils.JsonUtils.parseMap(json['dialogConfigs'])) : const DialogConfigs(),
-      progressIndicatorConfigs: json['progressIndicatorConfigs'] != null ? ProgressIndicatorConfigs.fromJson(utils.JsonUtils.parseMap(json['progressIndicatorConfigs'])) : const ProgressIndicatorConfigs(),
-      videoEditor: json['videoEditor'] != null ? VideoEditorConfigs.fromJson(utils.JsonUtils.parseMap(json['videoEditor'])) : const VideoEditorConfigs(enabled: false),
-      designMode: utils.JsonUtils.parseEnum(ImageEditorDesignMode.values, json['designMode'], ImageEditorDesignMode.material),
+      theme: theme, // Use the theme passed from Flet context
+      heroTag: parseString(json['heroTag'] as String?, 'Pro-Image-Editor-Hero'),
+      i18n: json['i18n'] != null ? I18n.fromJson(json['i18n'] is Map ? Map<String, dynamic>.from(json['i18n'] as Map) : {}) : const I18n(),
+      mainEditor: json['mainEditor'] != null ? MainEditorConfigs.fromJson(theme, json['mainEditor'] is Map ? Map<String, dynamic>.from(json['mainEditor'] as Map) : {}) : const MainEditorConfigs(),
+      paintEditor: json['paintEditor'] != null ? PaintEditorConfigs.fromJson(theme, json['paintEditor'] is Map ? Map<String, dynamic>.from(json['paintEditor'] as Map) : {}) : const PaintEditorConfigs(),
+      textEditor: json['textEditor'] != null ? TextEditorConfigs.fromJson(theme, json['textEditor'] is Map ? Map<String, dynamic>.from(json['textEditor'] as Map) : {}) : const TextEditorConfigs(),
+      cropRotateEditor: json['cropRotateEditor'] != null ? CropRotateEditorConfigs.fromJson(theme, json['cropRotateEditor'] is Map ? Map<String, dynamic>.from(json['cropRotateEditor'] as Map) : {}) : const CropRotateEditorConfigs(),
+      filterEditor: json['filterEditor'] != null ? FilterEditorConfigs.fromJson(theme, json['filterEditor'] is Map ? Map<String, dynamic>.from(json['filterEditor'] as Map) : {}) : const FilterEditorConfigs(),
+      tuneEditor: json['tuneEditor'] != null ? TuneEditorConfigs.fromJson(theme, json['tuneEditor'] is Map ? Map<String, dynamic>.from(json['tuneEditor'] as Map) : {}) : const TuneEditorConfigs(),
+      blurEditor: json['blurEditor'] != null ? BlurEditorConfigs.fromJson(theme, json['blurEditor'] is Map ? Map<String, dynamic>.from(json['blurEditor'] as Map) : {}) : const BlurEditorConfigs(),
+      emojiEditor: json['emojiEditor'] != null ? EmojiEditorConfigs.fromJson(theme, json['emojiEditor'] is Map ? Map<String, dynamic>.from(json['emojiEditor'] as Map) : {}) : const EmojiEditorConfigs(),
+      stickerEditor: json['stickerEditor'] != null ? StickerEditorConfigs.fromJson(theme, json['stickerEditor'] is Map ? Map<String, dynamic>.from(json['stickerEditor'] as Map) : {}) : const StickerEditorConfigs(),
+      stateHistory: json['stateHistory'] != null ? StateHistoryConfigs.fromJson(json['stateHistory'] is Map ? Map<String, dynamic>.from(json['stateHistory'] as Map) : {}) : const StateHistoryConfigs(),
+      imageGeneration: json['imageGeneration'] != null ? ImageGenerationConfigs.fromJson(theme, json['imageGeneration'] is Map ? Map<String, dynamic>.from(json['imageGeneration'] as Map) : {}) : const ImageGenerationConfigs(),
+      helperLines: json['helperLines'] != null ? HelperLineConfigs.fromJson(theme, json['helperLines'] is Map ? Map<String, dynamic>.from(json['helperLines'] as Map) : {}) : const HelperLineConfigs(),
+      layerInteraction: json['layerInteraction'] != null ? LayerInteractionConfigs.fromJson(theme, json['layerInteraction'] is Map ? Map<String, dynamic>.from(json['layerInteraction'] as Map) : {}) : const LayerInteractionConfigs(),
+      dialogConfigs: json['dialogConfigs'] != null ? DialogConfigs.fromJson(theme, json['dialogConfigs'] is Map ? Map<String, dynamic>.from(json['dialogConfigs'] as Map) : {}) : const DialogConfigs(),
+      progressIndicatorConfigs: json['progressIndicatorConfigs'] != null ? ProgressIndicatorConfigs.fromJson(theme, json['progressIndicatorConfigs'] is Map ? Map<String, dynamic>.from(json['progressIndicatorConfigs'] as Map) : {}) : const ProgressIndicatorConfigs(),
+      videoEditor: json['videoEditor'] != null ? VideoEditorConfigs.fromJson(json['videoEditor'] is Map ? Map<String, dynamic>.from(json['videoEditor'] as Map) : {}) : const VideoEditorConfigs(enabled: false),
+      designMode: tempDesignMode,
     );
   }
 }

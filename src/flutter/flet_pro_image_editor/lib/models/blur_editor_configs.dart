@@ -1,4 +1,4 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 import './editor_safe_area.dart';
 import './blur_editor_style.dart'; // Assuming this was created as a placeholder
 import './blur_editor_icons.dart'; // Assuming this was created as a placeholder
@@ -25,13 +25,13 @@ class BlurEditorConfigs {
 
   factory BlurEditorConfigs.fromJson(Map<String, dynamic> json) {
     return BlurEditorConfigs(
-      enabled: utils.JsonUtils.parseBool(json['enabled'], true),
-      showLayers: utils.JsonUtils.parseBool(json['showLayers'], true),
-      maxBlur: utils.JsonUtils.parseDouble(json['maxBlur'], 5.0),
-      safeArea: json['safeArea'] != null ? EditorSafeArea.fromJson(utils.JsonUtils.parseMap(json['safeArea'])) : const EditorSafeArea(),
-      style: json['style'] != null ? BlurEditorStyle.fromJson(utils.JsonUtils.parseMap(json['style'])) : const BlurEditorStyle(),
-      icons: json['icons'] != null ? BlurEditorIcons.fromJson(utils.JsonUtils.parseMap(json['icons'])) : const BlurEditorIcons(),
-      widgets: json['widgets'] != null ? BlurEditorWidgets.fromJson(utils.JsonUtils.parseMap(json['widgets'])) : const BlurEditorWidgets(),
+      enabled: parseBool(json['enabled'], true),
+      showLayers: parseBool(json['showLayers'], true),
+      maxBlur: parseDouble(json['maxBlur'], 5.0),
+      safeArea: json['safeArea'] != null ? EditorSafeArea.fromJson(json['safeArea'] is Map ? Map<String, dynamic>.from(json['safeArea'] as Map) : {}) : const EditorSafeArea(),
+      style: json['style'] != null ? BlurEditorStyle.fromJson(json['style'] is Map ? Map<String, dynamic>.from(json['style'] as Map) : {}) : const BlurEditorStyle(),
+      icons: json['icons'] != null ? BlurEditorIcons.fromJson(json['icons'] is Map ? Map<String, dynamic>.from(json['icons'] as Map) : {}) : const BlurEditorIcons(),
+      widgets: json['widgets'] != null ? BlurEditorWidgets.fromJson(json['widgets'] is Map ? Map<String, dynamic>.from(json['widgets'] as Map) : {}) : const BlurEditorWidgets(),
     );
   }
 }

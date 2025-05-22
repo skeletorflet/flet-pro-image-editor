@@ -1,8 +1,8 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
+import 'package:flutter/material.dart'; // For ThemeData and Duration
 import './layer_interaction_icons.dart'; // Assuming this was created as a placeholder
 import './layer_interaction_widgets.dart'; // Assuming this was created as a placeholder
 import './layer_interaction_style.dart'; // Assuming this was created as a placeholder
-// For Duration, if used directly, import 'package:flutter/material.dart';
 
 // Define enums used by this config class
 enum LayerInteractionSelectable {
@@ -32,16 +32,27 @@ class LayerInteractionConfigs {
     this.style = const LayerInteractionStyle(),
   });
 
-  factory LayerInteractionConfigs.fromJson(Map<String, dynamic> json) {
+  factory LayerInteractionConfigs.fromJson(ThemeData? theme, Map<String, dynamic> json) {
+    LayerInteractionSelectable tempSelectable = LayerInteractionSelectable.auto;
+    dynamic rawSelectable = json['selectable'];
+    if (rawSelectable is String) {
+      tempSelectable = LayerInteractionSelectable.values.firstWhere(
+        (e) => e.toString().split('.').last.toLowerCase() == rawSelectable.toLowerCase(),
+        orElse: () => LayerInteractionSelectable.auto
+      );
+    } else if (LayerInteractionSelectable.values.contains(rawSelectable)) {
+      tempSelectable = rawSelectable;
+    }
+
     return LayerInteractionConfigs(
-      selectable: utils.JsonUtils.parseEnum(LayerInteractionSelectable.values, json['selectable'], LayerInteractionSelectable.auto),
-      initialSelected: utils.JsonUtils.parseBool(json['initialSelected'], false),
-      hideToolbarOnInteraction: utils.JsonUtils.parseBool(json['hideToolbarOnInteraction'], false),
-      hideVideoControlsOnInteraction: utils.JsonUtils.parseBool(json['hideVideoControlsOnInteraction'], true),
-      videoControlsSwitchDuration: utils.JsonUtils.parseDuration(json['videoControlsSwitchDuration'], const Duration(milliseconds: 220)),
-      icons: json['icons'] != null ? LayerInteractionIcons.fromJson(utils.JsonUtils.parseMap(json['icons'])) : const LayerInteractionIcons(),
-      widgets: json['widgets'] != null ? LayerInteractionWidgets.fromJson(utils.JsonUtils.parseMap(json['widgets'])) : const LayerInteractionWidgets(),
-      style: json['style'] != null ? LayerInteractionStyle.fromJson(utils.JsonUtils.parseMap(json['style'])) : const LayerInteractionStyle(),
+      selectable: tempSelectable,
+      initialSelected: parseBool(json['initialSelected'], false),
+      hideToolbarOnInteraction: parseBool(json['hideToolbarOnInteraction'], false),
+      hideVideoControlsOnInteraction: parseBool(json['hideVideoControlsOnInteraction'], true),
+      videoControlsSwitchDuration: parseAnimationDuration(json['videoControlsSwitchDuration'], const Duration(milliseconds: 220)),
+      icons: json['icons'] != null ? LayerInteractionIcons.fromJson(json['icons'] is Map ? Map<String, dynamic>.from(json['icons'] as Map) : {}) : const LayerInteractionIcons(),
+      widgets: json['widgets'] != null ? LayerInteractionWidgets.fromJson(json['widgets'] is Map ? Map<String, dynamic>.from(json['widgets'] as Map) : {}) : const LayerInteractionWidgets(),
+      style: json['style'] != null ? LayerInteractionStyle.fromJson(theme, json['style'] is Map ? Map<String, dynamic>.from(json['style'] as Map) : {}) : const LayerInteractionStyle(),
     );
   }
 }

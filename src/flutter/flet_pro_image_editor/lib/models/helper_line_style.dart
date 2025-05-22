@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; // For Color
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class HelperLineStyle {
   final Color color;
@@ -10,10 +10,10 @@ class HelperLineStyle {
     this.strokeWidth = 1.0,
   });
 
-  factory HelperLineStyle.fromJson(Map<String, dynamic> json) {
+  factory HelperLineStyle.fromJson(ThemeData? theme, Map<String, dynamic> json) {
     return HelperLineStyle(
-      color: utils.JsonUtils.parseColor(json['color'], const Color(0x4BFFFFFF)),
-      strokeWidth: utils.JsonUtils.parseDouble(json['strokeWidth'], 1.0),
+      color: parseColor(theme, json['color'] as String?, const Color(0x4BFFFFFF)),
+      strokeWidth: parseDouble(json['strokeWidth'], 1.0),
     );
   }
 }

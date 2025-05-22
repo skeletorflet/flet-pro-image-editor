@@ -1,4 +1,5 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
+import 'package:flutter/material.dart'; // For ThemeData
 import './sticker_editor_style.dart'; // Assuming this was created as a placeholder
 import './sticker_editor_icons.dart'; // Assuming this was created as a placeholder
 
@@ -21,15 +22,15 @@ class StickerEditorConfigs {
     this.icons = const StickerEditorIcons(),
   });
 
-  factory StickerEditorConfigs.fromJson(Map<String, dynamic> json) {
+  factory StickerEditorConfigs.fromJson(ThemeData? theme, Map<String, dynamic> json) {
     return StickerEditorConfigs(
       // buildStickers: null, // Cannot deserialize Python Callable to Dart Function easily
-      initWidth: utils.JsonUtils.parseDouble(json['initWidth'], 100.0),
-      minScale: utils.JsonUtils.parseDouble(json['minScale'], double.negativeInfinity),
-      maxScale: utils.JsonUtils.parseDouble(json['maxScale'], double.infinity),
-      enabled: utils.JsonUtils.parseBool(json['enabled'], false),
-      style: json['style'] != null ? StickerEditorStyle.fromJson(utils.JsonUtils.parseMap(json['style'])) : const StickerEditorStyle(),
-      icons: json['icons'] != null ? StickerEditorIcons.fromJson(utils.JsonUtils.parseMap(json['icons'])) : const StickerEditorIcons(),
+      initWidth: parseDouble(json['initWidth'], 100.0),
+      minScale: parseDouble(json['minScale'], double.negativeInfinity),
+      maxScale: parseDouble(json['maxScale'], double.infinity),
+      enabled: parseBool(json['enabled'], false),
+      style: json['style'] != null ? StickerEditorStyle.fromJson(theme, json['style'] is Map ? Map<String, dynamic>.from(json['style'] as Map) : {}) : const StickerEditorStyle(),
+      icons: json['icons'] != null ? StickerEditorIcons.fromJson(json['icons'] is Map ? Map<String, dynamic>.from(json['icons'] as Map) : {}) : const StickerEditorIcons(),
     );
   }
 }

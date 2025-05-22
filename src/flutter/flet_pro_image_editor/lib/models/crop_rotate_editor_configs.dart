@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; // For Curves
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 import './aspect_ratio_item.dart';
 import './editor_safe_area.dart';
 import './crop_rotate_editor_style.dart'; // Assuming this was created as a placeholder
@@ -93,44 +93,63 @@ class CropRotateEditorConfigs {
   });
 
   factory CropRotateEditorConfigs.fromJson(Map<String, dynamic> json) {
+    RotateDirection tempRotateDirection = RotateDirection.left; // Default
+    dynamic rawRotateDirection = json['rotateDirection'];
+    if (rawRotateDirection is String) {
+      tempRotateDirection = RotateDirection.values.firstWhere(
+        (e) => e.toString().split('.').last.toLowerCase() == rawRotateDirection.toLowerCase(),
+        orElse: () => RotateDirection.left
+      );
+    } else if (RotateDirection.values.contains(rawRotateDirection)) {
+      tempRotateDirection = rawRotateDirection;
+    }
+
+    List<AspectRatioItem> tempAspectRatios = const [ // Default
+      AspectRatioItem(text: 'Free', value: -1), AspectRatioItem(text: 'Original', value: 0.0),
+      AspectRatioItem(text: '1*1', value: 1.0 / 1.0), AspectRatioItem(text: '4*3', value: 4.0 / 3.0),
+      AspectRatioItem(text: '3*4', value: 3.0 / 4.0), AspectRatioItem(text: '16*9', value: 16.0 / 9.0),
+      AspectRatioItem(text: '9*16', value: 9.0 / 16.0)
+    ];
+    dynamic rawList = json['aspectRatios'];
+    if (rawList is List) {
+      tempAspectRatios = rawList.map((item) {
+        return AspectRatioItem.fromJson(item as Map<String,dynamic>);
+      }).toList().cast<AspectRatioItem>();
+    }
+
     return CropRotateEditorConfigs(
-      desktopCornerDragArea: utils.JsonUtils.parseDouble(json['desktopCornerDragArea'], 7.0),
-      mobileCornerDragArea: utils.JsonUtils.parseDouble(json['mobileCornerDragArea'], 48.0),
-      enabled: utils.JsonUtils.parseBool(json['enabled'], true),
-      showRotateButton: utils.JsonUtils.parseBool(json['showRotateButton'], true),
-      showFlipButton: utils.JsonUtils.parseBool(json['showFlipButton'], true),
-      showAspectRatioButton: utils.JsonUtils.parseBool(json['showAspectRatioButton'], true),
-      showResetButton: utils.JsonUtils.parseBool(json['showResetButton'], true),
-      invertMouseScroll: utils.JsonUtils.parseBool(json['invertMouseScroll'], false),
-      invertDragDirection: utils.JsonUtils.parseBool(json['invertDragDirection'], false),
-      enableRoundCropper: utils.JsonUtils.parseBool(json['enableRoundCropper'], false),
-      enableTransformLayers: utils.JsonUtils.parseBool(json['enableTransformLayers'], true),
-      enableProvideImageInfos: utils.JsonUtils.parseBool(json['enableProvideImageInfos'], false),
-      enableDoubleTap: utils.JsonUtils.parseBool(json['enableDoubleTap'], true),
-      showLayers: utils.JsonUtils.parseBool(json['showLayers'], true),
+      desktopCornerDragArea: parseDouble(json['desktopCornerDragArea'], 7.0),
+      mobileCornerDragArea: parseDouble(json['mobileCornerDragArea'], 48.0),
+      enabled: parseBool(json['enabled'], true),
+      showRotateButton: parseBool(json['showRotateButton'], true),
+      showFlipButton: parseBool(json['showFlipButton'], true),
+      showAspectRatioButton: parseBool(json['showAspectRatioButton'], true),
+      showResetButton: parseBool(json['showResetButton'], true),
+      invertMouseScroll: parseBool(json['invertMouseScroll'], false),
+      invertDragDirection: parseBool(json['invertDragDirection'], false),
+      enableRoundCropper: parseBool(json['enableRoundCropper'], false),
+      enableTransformLayers: parseBool(json['enableTransformLayers'], true),
+      enableProvideImageInfos: parseBool(json['enableProvideImageInfos'], false),
+      enableDoubleTap: parseBool(json['enableDoubleTap'], true),
+      showLayers: parseBool(json['showLayers'], true),
       initAspectRatio: json['initAspectRatio'] as double?,
-      rotateAnimationCurve: utils.JsonUtils.parseCurve(json['rotateAnimationCurve'] as String?, Curves.decelerate),
-      scaleAnimationCurve: utils.JsonUtils.parseCurve(json['scaleAnimationCurve'] as String?, Curves.decelerate),
-      cropDragAnimationCurve: utils.JsonUtils.parseCurve(json['cropDragAnimationCurve'] as String?, Curves.decelerate),
-      fadeInOutsideCropAreaAnimationCurve: utils.JsonUtils.parseCurve(json['fadeInOutsideCropAreaAnimationCurve'] as String?, Curves.decelerate),
-      rotateDirection: utils.JsonUtils.parseEnum(RotateDirection.values, json['rotateDirection'], RotateDirection.left),
-      opacityOutsideCropAreaDuration: utils.JsonUtils.parseDuration(json['opacityOutsideCropAreaDuration'], const Duration(milliseconds: 100)),
-      animationDuration: utils.JsonUtils.parseDuration(json['animationDuration'], const Duration(milliseconds: 250)),
-      fadeInOutsideCropAreaAnimationDuration: utils.JsonUtils.parseDuration(json['fadeInOutsideCropAreaAnimationDuration'], const Duration(milliseconds: 350)),
-      cropDragAnimationDuration: utils.JsonUtils.parseDuration(json['cropDragAnimationDuration'], const Duration(milliseconds: 400)),
-      maxScale: utils.JsonUtils.parseDouble(json['maxScale'], 7.0),
-      mouseScaleFactor: utils.JsonUtils.parseDouble(json['mouseScaleFactor'], 0.1),
-      doubleTapScaleFactor: utils.JsonUtils.parseDouble(json['doubleTapScaleFactor'], 2.0),
-      aspectRatios: utils.JsonUtils.parseList<AspectRatioItem>(json['aspectRatios'], (item) => AspectRatioItem.fromJson(utils.JsonUtils.parseMap(item)), const [
-          AspectRatioItem(text: 'Free', value: -1), AspectRatioItem(text: 'Original', value: 0.0),
-          AspectRatioItem(text: '1*1', value: 1.0 / 1.0), AspectRatioItem(text: '4*3', value: 4.0 / 3.0),
-          AspectRatioItem(text: '3*4', value: 3.0 / 4.0), AspectRatioItem(text: '16*9', value: 16.0 / 9.0),
-          AspectRatioItem(text: '9*16', value: 9.0 / 16.0)
-        ]),
-      safeArea: json['safeArea'] != null ? EditorSafeArea.fromJson(utils.JsonUtils.parseMap(json['safeArea'])) : const EditorSafeArea(),
-      style: json['style'] != null ? CropRotateEditorStyle.fromJson(utils.JsonUtils.parseMap(json['style'])) : const CropRotateEditorStyle(),
-      icons: json['icons'] != null ? CropRotateEditorIcons.fromJson(utils.JsonUtils.parseMap(json['icons'])) : const CropRotateEditorIcons(),
-      widgets: json['widgets'] != null ? CropRotateEditorWidgets.fromJson(utils.JsonUtils.parseMap(json['widgets'])) : const CropRotateEditorWidgets(),
+      rotateAnimationCurve: parseCurve(json['rotateAnimationCurve'] as String?, Curves.decelerate),
+      scaleAnimationCurve: parseCurve(json['scaleAnimationCurve'] as String?, Curves.decelerate),
+      cropDragAnimationCurve: parseCurve(json['cropDragAnimationCurve'] as String?, Curves.decelerate),
+      fadeInOutsideCropAreaAnimationCurve: parseCurve(json['fadeInOutsideCropAreaAnimationCurve'] as String?, Curves.decelerate),
+      rotateDirection: tempRotateDirection,
+      opacityOutsideCropAreaDuration: parseAnimationDuration(json['opacityOutsideCropAreaDuration'], const Duration(milliseconds: 100)),
+      animationDuration: parseAnimationDuration(json['animationDuration'], const Duration(milliseconds: 250)),
+      fadeInOutsideCropAreaAnimationDuration: parseAnimationDuration(json['fadeInOutsideCropAreaAnimationDuration'], const Duration(milliseconds: 350)),
+      cropDragAnimationDuration: parseAnimationDuration(json['cropDragAnimationDuration'], const Duration(milliseconds: 400)),
+      maxScale: parseDouble(json['maxScale'], 7.0),
+      mouseScaleFactor: parseDouble(json['mouseScaleFactor'], 0.1),
+      doubleTapScaleFactor: parseDouble(json['doubleTapScaleFactor'], 2.0),
+      aspectRatios: tempAspectRatios,
+      safeArea: json['safeArea'] != null ? EditorSafeArea.fromJson(json['safeArea'] is Map ? Map<String, dynamic>.from(json['safeArea'] as Map) : {}) : const EditorSafeArea(),
+      style: json['style'] != null ? CropRotateEditorStyle.fromJson(json['style'] is Map ? Map<String, dynamic>.from(json['style'] as Map) : {}) : const CropRotateEditorStyle(),
+      icons: json['icons'] != null ? CropRotateEditorIcons.fromJson(json['icons'] is Map ? Map<String, dynamic>.from(json['icons'] as Map) : {}) : const CropRotateEditorIcons(),
+      widgets: json['widgets'] != null ? CropRotateEditorWidgets.fromJson(json['widgets'] is Map ? Map<String, dynamic>.from(json['widgets'] as Map) : {}) : const CropRotateEditorWidgets(),
       maxWidthFactor: json['maxWidthFactor'] as double?,
     );
   }

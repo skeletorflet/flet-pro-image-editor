@@ -1,4 +1,4 @@
-import '../../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class I18nLayerInteraction {
   final String remove;
@@ -13,9 +13,9 @@ class I18nLayerInteraction {
 
   factory I18nLayerInteraction.fromJson(Map<String, dynamic> json) {
     return I18nLayerInteraction(
-      remove: utils.JsonUtils.parseString(json['remove'], 'Remove'),
-      edit: utils.JsonUtils.parseString(json['edit'], 'Edit'),
-      rotateScale: utils.JsonUtils.parseString(json['rotateScale'], 'Rotate and Scale'),
+      remove: parseString(json['remove'] as String?, 'Remove'),
+      edit: parseString(json['edit'] as String?, 'Edit'),
+      rotateScale: parseString(json['rotateScale'] as String?, 'Rotate and Scale'),
     );
   }
 }

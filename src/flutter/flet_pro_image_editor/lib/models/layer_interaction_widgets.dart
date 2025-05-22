@@ -1,5 +1,3 @@
-import '../utils/json_utils.dart' as utils;
-
 class LayerInteractionWidgets {
   const LayerInteractionWidgets();
 

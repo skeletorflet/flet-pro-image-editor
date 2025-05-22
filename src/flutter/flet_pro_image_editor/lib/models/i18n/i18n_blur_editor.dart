@@ -1,4 +1,4 @@
-import '../../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class I18nBlurEditor {
   final String bottomNavigationBarText;
@@ -13,9 +13,9 @@ class I18nBlurEditor {
 
   factory I18nBlurEditor.fromJson(Map<String, dynamic> json) {
     return I18nBlurEditor(
-      bottomNavigationBarText: utils.JsonUtils.parseString(json['bottomNavigationBarText'], 'Blur'),
-      back: utils.JsonUtils.parseString(json['back'], 'Back'),
-      done: utils.JsonUtils.parseString(json['done'], 'Done'),
+      bottomNavigationBarText: parseString(json['bottomNavigationBarText'] as String?, 'Blur'),
+      back: parseString(json['back'] as String?, 'Back'),
+      done: parseString(json['done'] as String?, 'Done'),
     );
   }
 }

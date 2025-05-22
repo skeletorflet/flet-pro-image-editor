@@ -1,4 +1,4 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class VideoEditorConfigs {
   final bool enabled;
@@ -9,7 +9,7 @@ class VideoEditorConfigs {
 
   factory VideoEditorConfigs.fromJson(Map<String, dynamic> json) {
     return VideoEditorConfigs(
-      enabled: utils.JsonUtils.parseBool(json['enabled'], false),
+      enabled: parseBool(json['enabled'], false),
     );
   }
 }

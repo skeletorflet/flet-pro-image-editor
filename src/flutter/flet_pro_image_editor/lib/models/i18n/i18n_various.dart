@@ -1,4 +1,4 @@
-import '../../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class I18nVarious {
   final String loadingDialogMsg;
@@ -18,15 +18,15 @@ class I18nVarious {
 
   factory I18nVarious.fromJson(Map<String, dynamic> json) {
     return I18nVarious(
-      loadingDialogMsg: utils.JsonUtils.parseString(json['loadingDialogMsg'], 'Please wait...'),
+      loadingDialogMsg: parseString(json['loadingDialogMsg'] as String?, 'Please wait...'),
       closeEditorWarningTitle:
-          utils.JsonUtils.parseString(json['closeEditorWarningTitle'], 'Close Image Editor?'),
-      closeEditorWarningMessage: utils.JsonUtils.parseString(json['closeEditorWarningMessage'],
+          parseString(json['closeEditorWarningTitle'] as String?, 'Close Image Editor?'),
+      closeEditorWarningMessage: parseString(json['closeEditorWarningMessage'] as String?,
           'Are you sure you want to close the Image Editor? Your changes will not be saved.'),
       closeEditorWarningConfirmBtn:
-          utils.JsonUtils.parseString(json['closeEditorWarningConfirmBtn'], 'OK'),
+          parseString(json['closeEditorWarningConfirmBtn'] as String?, 'OK'),
       closeEditorWarningCancelBtn:
-          utils.JsonUtils.parseString(json['closeEditorWarningCancelBtn'], 'Cancel'),
+          parseString(json['closeEditorWarningCancelBtn'] as String?, 'Cancel'),
     );
   }
 }

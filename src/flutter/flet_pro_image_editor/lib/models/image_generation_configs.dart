@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; // For Color
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 import './processor_configs.dart'; // Placeholder
 import './size.dart';
 
@@ -62,25 +62,58 @@ class ImageGenerationConfigs {
     this.maxThumbnailSize = const Size(width: 100, height: 100),
   });
 
-  factory ImageGenerationConfigs.fromJson(Map<String, dynamic> json) {
+  factory ImageGenerationConfigs.fromJson(ThemeData? theme, Map<String, dynamic> json) {
+    PngFilter tempPngFilter = PngFilter.none;
+    dynamic rawPngFilter = json['pngFilter'];
+    if (rawPngFilter is String) {
+      tempPngFilter = PngFilter.values.firstWhere(
+        (e) => e.toString().split('.').last.toLowerCase() == rawPngFilter.toLowerCase(),
+        orElse: () => PngFilter.none
+      );
+    } else if (PngFilter.values.contains(rawPngFilter)) {
+      tempPngFilter = rawPngFilter;
+    }
+
+    JpegChroma tempJpegChroma = JpegChroma.yuv444;
+    dynamic rawJpegChroma = json['jpegChroma'];
+    if (rawJpegChroma is String) {
+      tempJpegChroma = JpegChroma.values.firstWhere(
+        (e) => e.toString().split('.').last.toLowerCase() == rawJpegChroma.toLowerCase(),
+        orElse: () => JpegChroma.yuv444
+      );
+    } else if (JpegChroma.values.contains(rawJpegChroma)) {
+      tempJpegChroma = rawJpegChroma;
+    }
+
+    OutputFormat tempOutputFormat = OutputFormat.jpg;
+    dynamic rawOutputFormat = json['outputFormat'];
+    if (rawOutputFormat is String) {
+      tempOutputFormat = OutputFormat.values.firstWhere(
+        (e) => e.toString().split('.').last.toLowerCase() == rawOutputFormat.toLowerCase(),
+        orElse: () => OutputFormat.jpg
+      );
+    } else if (OutputFormat.values.contains(rawOutputFormat)) {
+      tempOutputFormat = rawOutputFormat;
+    }
+
     return ImageGenerationConfigs(
-      cropToImageBounds: utils.JsonUtils.parseBool(json['cropToImageBounds'], true),
-      cropToDrawingBounds: utils.JsonUtils.parseBool(json['cropToDrawingBounds'], true),
-      allowEmptyEditingCompletion: utils.JsonUtils.parseBool(json['allowEmptyEditingCompletion'], true),
-      enableIsolateGeneration: utils.JsonUtils.parseBool(json['enableIsolateGeneration'], true),
-      enableBackgroundGeneration: utils.JsonUtils.parseBool(json['enableBackgroundGeneration'], true),
-      enableUseOriginalBytes: utils.JsonUtils.parseBool(json['enableUseOriginalBytes'], true),
-      singleFrame: utils.JsonUtils.parseBool(json['singleFrame'], false),
+      cropToImageBounds: parseBool(json['cropToImageBounds'], true),
+      cropToDrawingBounds: parseBool(json['cropToDrawingBounds'], true),
+      allowEmptyEditingCompletion: parseBool(json['allowEmptyEditingCompletion'], true),
+      enableIsolateGeneration: parseBool(json['enableIsolateGeneration'], true),
+      enableBackgroundGeneration: parseBool(json['enableBackgroundGeneration'], true),
+      enableUseOriginalBytes: parseBool(json['enableUseOriginalBytes'], true),
+      singleFrame: parseBool(json['singleFrame'], false),
       customPixelRatio: json['customPixelRatio'] as double?,
-      jpegQuality: utils.JsonUtils.parseInt(json['jpegQuality'], 100),
-      pngLevel: utils.JsonUtils.parseInt(json['pngLevel'], 6),
-      pngFilter: utils.JsonUtils.parseEnum(PngFilter.values, json['pngFilter'], PngFilter.none),
-      jpegChroma: utils.JsonUtils.parseEnum(JpegChroma.values, json['jpegChroma'], JpegChroma.yuv444),
-      jpegBackgroundColor: utils.JsonUtils.parseColor(json['jpegBackgroundColor'], const Color(0xFFFFFFFF)),
-      outputFormat: utils.JsonUtils.parseEnum(OutputFormat.values, json['outputFormat'], OutputFormat.jpg),
-      processorConfigs: json['processorConfigs'] != null ? ProcessorConfigs.fromJson(utils.JsonUtils.parseMap(json['processorConfigs'])) : const ProcessorConfigs(),
-      maxOutputSize: json['maxOutputSize'] != null ? Size.fromJson(utils.JsonUtils.parseMap(json['maxOutputSize'])) : const Size(width: 2000, height: 2000),
-      maxThumbnailSize: json['maxThumbnailSize'] != null ? Size.fromJson(utils.JsonUtils.parseMap(json['maxThumbnailSize'])) : const Size(width: 100, height: 100),
+      jpegQuality: parseInt(json['jpegQuality'], 100),
+      pngLevel: parseInt(json['pngLevel'], 6),
+      pngFilter: tempPngFilter,
+      jpegChroma: tempJpegChroma,
+      jpegBackgroundColor: parseColor(theme, json['jpegBackgroundColor'] as String?, const Color(0xFFFFFFFF)),
+      outputFormat: tempOutputFormat,
+      processorConfigs: json['processorConfigs'] != null ? ProcessorConfigs.fromJson(json['processorConfigs'] is Map ? Map<String, dynamic>.from(json['processorConfigs'] as Map) : {}) : const ProcessorConfigs(),
+      maxOutputSize: json['maxOutputSize'] != null ? Size.fromJson(json['maxOutputSize'] is Map ? Map<String, dynamic>.from(json['maxOutputSize'] as Map) : {}) : const Size(width: 2000, height: 2000),
+      maxThumbnailSize: json['maxThumbnailSize'] != null ? Size.fromJson(json['maxThumbnailSize'] is Map ? Map<String, dynamic>.from(json['maxThumbnailSize'] as Map) : {}) : const Size(width: 100, height: 100),
     );
   }
 }

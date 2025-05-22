@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; // For EdgeInsets, Curves
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 import './censor_configs.dart';
 import './editor_safe_area.dart';
 import './paint_editor_style.dart';
@@ -94,43 +94,65 @@ class PaintEditorConfigs {
     this.widgets = const PaintEditorWidgets(),
   });
 
-  factory PaintEditorConfigs.fromJson(Map<String, dynamic> json) {
+  factory PaintEditorConfigs.fromJson(ThemeData? theme, Map<String, dynamic> json) {
+    EdgeInsets tempBoundaryMargin = EdgeInsets.zero;
+    if (json['boundaryMargin'] is Map) {
+      final map = Map<String, dynamic>.from(json['boundaryMargin'] as Map);
+      tempBoundaryMargin = EdgeInsets.fromLTRB(
+        parseDouble(map['left'], 0.0),
+        parseDouble(map['top'], 0.0),
+        parseDouble(map['right'], 0.0),
+        parseDouble(map['bottom'], 0.0),
+      );
+    }
+
+    PaintMode tempInitialPaintMode = PaintMode.freeStyle;
+    dynamic rawMode = json['initialPaintMode'];
+    if (rawMode is String) {
+      tempInitialPaintMode = PaintMode.values.firstWhere(
+        (e) => e.toString().split('.').last.toLowerCase() == rawMode.toLowerCase(),
+        orElse: () => PaintMode.freeStyle
+      );
+    } else if (PaintMode.values.contains(rawMode)) {
+      tempInitialPaintMode = rawMode;
+    }
+
     return PaintEditorConfigs(
-      enabled: utils.JsonUtils.parseBool(json['enabled'], true),
-      enableZoom: utils.JsonUtils.parseBool(json['enableZoom'], false),
-      editorMinScale: utils.JsonUtils.parseDouble(json['editorMinScale'], 1.0),
-      editorMaxScale: utils.JsonUtils.parseDouble(json['editorMaxScale'], 5.0),
-      enableDoubleTapZoom: utils.JsonUtils.parseBool(json['enableDoubleTapZoom'], true),
-      doubleTapZoomFactor: utils.JsonUtils.parseDouble(json['doubleTapZoomFactor'], 2.0),
-      doubleTapZoomDuration: utils.JsonUtils.parseDuration(json['doubleTapZoomDuration'], const Duration(milliseconds: 180)),
-      doubleTapZoomCurve: utils.JsonUtils.parseCurve(json['doubleTapZoomCurve'] as String?, Curves.easeInOut),
-      boundaryMargin: utils.JsonUtils.parseEdgeInsets(utils.JsonUtils.parseMap(json['boundaryMargin']), EdgeInsets.zero),
-      enableModeFreeStyle: utils.JsonUtils.parseBool(json['enableModeFreeStyle'], true),
-      enableModeArrow: utils.JsonUtils.parseBool(json['enableModeArrow'], true),
-      enableModeLine: utils.JsonUtils.parseBool(json['enableModeLine'], true),
-      enableModeRect: utils.JsonUtils.parseBool(json['enableModeRect'], true),
-      enableModeCircle: utils.JsonUtils.parseBool(json['enableModeCircle'], true),
-      enableModeDashLine: utils.JsonUtils.parseBool(json['enableModeDashLine'], true),
-      enableModeBlur: utils.JsonUtils.parseBool(json['enableModeBlur'], true),
-      enableModePixelate: utils.JsonUtils.parseBool(json['enableModePixelate'], true),
-      enableModeEraser: utils.JsonUtils.parseBool(json['enableModeEraser'], true),
-      showToggleFillButton: utils.JsonUtils.parseBool(json['showToggleFillButton'], true),
-      showLineWidthAdjustmentButton: utils.JsonUtils.parseBool(json['showLineWidthAdjustmentButton'], true),
-      showOpacityAdjustmentButton: utils.JsonUtils.parseBool(json['showOpacityAdjustmentButton'], true),
-      isInitiallyFilled: utils.JsonUtils.parseBool(json['isInitiallyFilled'], false),
-      showLayers: utils.JsonUtils.parseBool(json['showLayers'], true),
-      enableShareZoomMatrix: utils.JsonUtils.parseBool(json['enableShareZoomMatrix'], true),
-      minScale: utils.JsonUtils.parseDouble(json['minScale'], double.negativeInfinity),
-      maxScale: utils.JsonUtils.parseDouble(json['maxScale'], double.infinity),
+      enabled: parseBool(json['enabled'], true),
+      enableZoom: parseBool(json['enableZoom'], false),
+      editorMinScale: parseDouble(json['editorMinScale'], 1.0),
+      editorMaxScale: parseDouble(json['editorMaxScale'], 5.0),
+      enableDoubleTapZoom: parseBool(json['enableDoubleTapZoom'], true),
+      doubleTapZoomFactor: parseDouble(json['doubleTapZoomFactor'], 2.0),
+      doubleTapZoomDuration: parseAnimationDuration(json['doubleTapZoomDuration'], const Duration(milliseconds: 180)),
+      doubleTapZoomCurve: parseCurve(json['doubleTapZoomCurve'] as String?, Curves.easeInOut),
+      boundaryMargin: tempBoundaryMargin,
+      enableModeFreeStyle: parseBool(json['enableModeFreeStyle'], true),
+      enableModeArrow: parseBool(json['enableModeArrow'], true),
+      enableModeLine: parseBool(json['enableModeLine'], true),
+      enableModeRect: parseBool(json['enableModeRect'], true),
+      enableModeCircle: parseBool(json['enableModeCircle'], true),
+      enableModeDashLine: parseBool(json['enableModeDashLine'], true),
+      enableModeBlur: parseBool(json['enableModeBlur'], true),
+      enableModePixelate: parseBool(json['enableModePixelate'], true),
+      enableModeEraser: parseBool(json['enableModeEraser'], true),
+      showToggleFillButton: parseBool(json['showToggleFillButton'], true),
+      showLineWidthAdjustmentButton: parseBool(json['showLineWidthAdjustmentButton'], true),
+      showOpacityAdjustmentButton: parseBool(json['showOpacityAdjustmentButton'], true),
+      isInitiallyFilled: parseBool(json['isInitiallyFilled'], false),
+      showLayers: parseBool(json['showLayers'], true),
+      enableShareZoomMatrix: parseBool(json['enableShareZoomMatrix'], true),
+      minScale: parseDouble(json['minScale'], double.negativeInfinity),
+      maxScale: parseDouble(json['maxScale'], double.infinity),
       enableFreeStyleHighPerformanceScaling: json['enableFreeStyleHighPerformanceScaling'] as bool?,
       enableFreeStyleHighPerformanceMoving: json['enableFreeStyleHighPerformanceMoving'] as bool?,
-      enableFreeStyleHighPerformanceHero: utils.JsonUtils.parseBool(json['enableFreeStyleHighPerformanceHero'], false),
-      initialPaintMode: utils.JsonUtils.parseEnum(PaintMode.values, json['initialPaintMode'], PaintMode.freeStyle),
-      censorConfigs: json['censorConfigs'] != null ? CensorConfigs.fromJson(utils.JsonUtils.parseMap(json['censorConfigs'])) : const CensorConfigs(),
-      safeArea: json['safeArea'] != null ? EditorSafeArea.fromJson(utils.JsonUtils.parseMap(json['safeArea'])) : const EditorSafeArea(),
-      style: json['style'] != null ? PaintEditorStyle.fromJson(utils.JsonUtils.parseMap(json['style'])) : const PaintEditorStyle(),
-      icons: json['icons'] != null ? PaintEditorIcons.fromJson(utils.JsonUtils.parseMap(json['icons'])) : const PaintEditorIcons(),
-      widgets: json['widgets'] != null ? PaintEditorWidgets.fromJson(utils.JsonUtils.parseMap(json['widgets'])) : const PaintEditorWidgets(),
+      enableFreeStyleHighPerformanceHero: parseBool(json['enableFreeStyleHighPerformanceHero'], false),
+      initialPaintMode: tempInitialPaintMode,
+      censorConfigs: json['censorConfigs'] != null ? CensorConfigs.fromJson(json['censorConfigs'] is Map ? Map<String, dynamic>.from(json['censorConfigs'] as Map) : {}) : const CensorConfigs(),
+      safeArea: json['safeArea'] != null ? EditorSafeArea.fromJson(json['safeArea'] is Map ? Map<String, dynamic>.from(json['safeArea'] as Map) : {}) : const EditorSafeArea(),
+      style: json['style'] != null ? PaintEditorStyle.fromJson(theme, json['style'] is Map ? Map<String, dynamic>.from(json['style'] as Map) : {}) : const PaintEditorStyle(),
+      icons: json['icons'] != null ? PaintEditorIcons.fromJson(json['icons'] is Map ? Map<String, dynamic>.from(json['icons'] as Map) : {}) : const PaintEditorIcons(),
+      widgets: json['widgets'] != null ? PaintEditorWidgets.fromJson(json['widgets'] is Map ? Map<String, dynamic>.from(json['widgets'] as Map) : {}) : const PaintEditorWidgets(),
     );
   }
 }

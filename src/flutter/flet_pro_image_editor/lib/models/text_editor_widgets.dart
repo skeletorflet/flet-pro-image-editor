@@ -1,4 +1,3 @@
-import '../utils/json_utils.dart' as utils;
 // Import any specific widget types or callbacks if needed in a non-placeholder version.
 
 class TextEditorWidgets {

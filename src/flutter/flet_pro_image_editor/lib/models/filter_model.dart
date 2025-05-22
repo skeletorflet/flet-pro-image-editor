@@ -1,4 +1,4 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 import 'dart:convert'; // For jsonDecode if matrix is passed as a string list
 
 class FilterModel {
@@ -15,14 +15,12 @@ class FilterModel {
     List<double> parsedMatrix = [];
 
     if (matrixData is List) {
-      parsedMatrix = utils.JsonUtils.parseList<double>(
-          matrixData, (item) => utils.JsonUtils.parseDouble(item, 0.0), []);
+      parsedMatrix = matrixData.map((item) => parseDouble(item, 0.0)).toList().cast<double>();
     } else if (matrixData is String) {
       // If matrixData is a JSON string representation of a list
       try {
         List<dynamic> decodedList = jsonDecode(matrixData);
-        parsedMatrix = utils.JsonUtils.parseList<double>(
-            decodedList, (item) => utils.JsonUtils.parseDouble(item, 0.0), []);
+        parsedMatrix = decodedList.map((item) => parseDouble(item, 0.0)).toList().cast<double>();
       } catch (e) {
         // Handle error or assign default
         parsedMatrix = [];
@@ -30,7 +28,7 @@ class FilterModel {
     }
 
     return FilterModel(
-      name: utils.JsonUtils.parseString(json['name'], 'Unknown Filter'),
+      name: parseString(json['name'] as String?, 'Unknown Filter'),
       matrix: parsedMatrix,
     );
   }

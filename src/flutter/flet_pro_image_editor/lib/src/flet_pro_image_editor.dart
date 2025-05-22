@@ -52,7 +52,7 @@ class _FletProImageEditorControlState extends State<FletProImageEditorControl> {
     if (rawConfigs is Map) {
       final configsMap = Map<String, dynamic>.from(rawConfigs);
       setState(() {
-        _editorConfigs = ProImageEditorConfigs.fromJson(configsMap); // This is the call
+        _editorConfigs = ProImageEditorConfigs.fromJson(Theme.of(context), configsMap); // This is the call
       });
     } else {
       // _editorConfigs remains its default

@@ -1,4 +1,4 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class EditorSafeArea {
   final bool top;
@@ -15,10 +15,10 @@ class EditorSafeArea {
 
   factory EditorSafeArea.fromJson(Map<String, dynamic> json) {
     return EditorSafeArea(
-      top: utils.JsonUtils.parseBool(json['top'], true),
-      left: utils.JsonUtils.parseBool(json['left'], true),
-      right: utils.JsonUtils.parseBool(json['right'], true),
-      bottom: utils.JsonUtils.parseBool(json['bottom'], true),
+      top: parseBool(json['top'], true),
+      left: parseBool(json['left'], true),
+      right: parseBool(json['right'], true),
+      bottom: parseBool(json['bottom'], true),
     );
   }
 }

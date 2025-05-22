@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; // For TextStyle
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 import './editor_safe_area.dart';
 import './text_editor_style.dart';
 import './text_editor_icons.dart';
@@ -71,30 +71,77 @@ class TextEditorConfigs {
     this.widgets = const TextEditorWidgets(),
   });
 
-  factory TextEditorConfigs.fromJson(Map<String, dynamic> json) {
+  factory TextEditorConfigs.fromJson(ThemeData? theme, Map<String, dynamic> json) {
+    List<TextStyle> tempCustomTextStyles = const [];
+    if (json['customTextStyles'] is List) {
+      tempCustomTextStyles = (json['customTextStyles'] as List).map((item) {
+        if (item is Map) {
+          final styleMap = Map<String, dynamic>.from(item);
+          return TextStyle(
+            color: styleMap['color'] != null ? parseColor(theme, styleMap['color'] as String?) : null,
+            fontFamily: styleMap['fontFamily'] as String?,
+            fontSize: styleMap['fontSize'] != null ? parseDouble(styleMap['fontSize'], 14.0) : null,
+          );
+        }
+        return const TextStyle();
+      }).toList();
+    }
+
+    TextStyle tempDefaultTextStyle = const TextStyle();
+    if (json['defaultTextStyle'] is Map) {
+      final styleMap = Map<String, dynamic>.from(json['defaultTextStyle'] as Map);
+      tempDefaultTextStyle = TextStyle(
+        color: styleMap['color'] != null ? parseColor(theme, styleMap['color'] as String?) : null,
+        fontFamily: styleMap['fontFamily'] as String?,
+        fontSize: styleMap['fontSize'] != null ? parseDouble(styleMap['fontSize'], 14.0) : null,
+      );
+    }
+    
+    TextAlign tempInitialTextAlign = TextAlign.center;
+    dynamic rawAlign = json['initialTextAlign'];
+    if (rawAlign is String) {
+      tempInitialTextAlign = TextAlign.values.firstWhere(
+        (e) => e.toString().split('.').last.toLowerCase() == rawAlign.toLowerCase(),
+        orElse: () => TextAlign.center
+      );
+    } else if (TextAlign.values.contains(rawAlign)) {
+      tempInitialTextAlign = rawAlign;
+    }
+
+    LayerBackgroundMode tempInitialBgMode = LayerBackgroundMode.backgroundAndColor;
+    dynamic rawBgMode = json['initialBackgroundColorMode'];
+    if (rawBgMode is String) {
+      tempInitialBgMode = LayerBackgroundMode.values.firstWhere(
+        (e) => e.toString().split('.').last.toLowerCase() == rawBgMode.toLowerCase(),
+        orElse: () => LayerBackgroundMode.backgroundAndColor
+      );
+    } else if (LayerBackgroundMode.values.contains(rawBgMode)) {
+      tempInitialBgMode = rawBgMode;
+    }
+
     return TextEditorConfigs(
-      enableSuggestions: utils.JsonUtils.parseBool(json['enableSuggestions'], true),
-      enabled: utils.JsonUtils.parseBool(json['enabled'], true),
-      enableAutocorrect: utils.JsonUtils.parseBool(json['enableAutocorrect'], true),
-      showSelectFontStyleBottomBar: utils.JsonUtils.parseBool(json['showSelectFontStyleBottomBar'], false),
-      showTextAlignButton: utils.JsonUtils.parseBool(json['showTextAlignButton'], true),
-      showFontScaleButton: utils.JsonUtils.parseBool(json['showFontScaleButton'], true),
-      showBackgroundModeButton: utils.JsonUtils.parseBool(json['showBackgroundModeButton'], true),
-      enableMainEditorZoomFactor: utils.JsonUtils.parseBool(json['enableMainEditorZoomFactor'], false),
-      initFontSize: utils.JsonUtils.parseDouble(json['initFontSize'], 24.0),
-      initialTextAlign: utils.JsonUtils.parseEnum(TextAlign.values, json['initialTextAlign'], TextAlign.center),
-      initFontScale: utils.JsonUtils.parseDouble(json['initFontScale'], 1.0),
-      maxFontScale: utils.JsonUtils.parseDouble(json['maxFontScale'], 3.0),
-      minFontScale: utils.JsonUtils.parseDouble(json['minFontScale'], 0.3),
-      minScale: utils.JsonUtils.parseDouble(json['minScale'], double.negativeInfinity),
-      maxScale: utils.JsonUtils.parseDouble(json['maxScale'], double.infinity),
-      customTextStyles: utils.JsonUtils.parseList<TextStyle>(json['customTextStyles'], (item) => utils.JsonUtils.parseTextStyle(utils.JsonUtils.parseMap(item)), []),
-      defaultTextStyle: utils.JsonUtils.parseTextStyle(utils.JsonUtils.parseMap(json['defaultTextStyle']), const TextStyle()),
-      initialBackgroundColorMode: utils.JsonUtils.parseEnum(LayerBackgroundMode.values, json['initialBackgroundColorMode'], LayerBackgroundMode.backgroundAndColor),
-      safeArea: json['safeArea'] != null ? EditorSafeArea.fromJson(utils.JsonUtils.parseMap(json['safeArea'])) : const EditorSafeArea(),
-      style: json['style'] != null ? TextEditorStyle.fromJson(utils.JsonUtils.parseMap(json['style'])) : const TextEditorStyle(),
-      icons: json['icons'] != null ? TextEditorIcons.fromJson(utils.JsonUtils.parseMap(json['icons'])) : const TextEditorIcons(),
-      widgets: json['widgets'] != null ? TextEditorWidgets.fromJson(utils.JsonUtils.parseMap(json['widgets'])) : const TextEditorWidgets(),
+      enableSuggestions: parseBool(json['enableSuggestions'], true),
+      enabled: parseBool(json['enabled'], true),
+      enableAutocorrect: parseBool(json['enableAutocorrect'], true),
+      showSelectFontStyleBottomBar: parseBool(json['showSelectFontStyleBottomBar'], false),
+      showTextAlignButton: parseBool(json['showTextAlignButton'], true),
+      showFontScaleButton: parseBool(json['showFontScaleButton'], true),
+      showBackgroundModeButton: parseBool(json['showBackgroundModeButton'], true),
+      enableMainEditorZoomFactor: parseBool(json['enableMainEditorZoomFactor'], false),
+      initFontSize: parseDouble(json['initFontSize'], 24.0),
+      initialTextAlign: tempInitialTextAlign,
+      initFontScale: parseDouble(json['initFontScale'], 1.0),
+      maxFontScale: parseDouble(json['maxFontScale'], 3.0),
+      minFontScale: parseDouble(json['minFontScale'], 0.3),
+      minScale: parseDouble(json['minScale'], double.negativeInfinity),
+      maxScale: parseDouble(json['maxScale'], double.infinity),
+      customTextStyles: tempCustomTextStyles,
+      defaultTextStyle: tempDefaultTextStyle,
+      initialBackgroundColorMode: tempInitialBgMode,
+      safeArea: json['safeArea'] != null ? EditorSafeArea.fromJson(json['safeArea'] is Map ? Map<String, dynamic>.from(json['safeArea'] as Map) : {}) : const EditorSafeArea(),
+      style: json['style'] != null ? TextEditorStyle.fromJson(theme, json['style'] is Map ? Map<String, dynamic>.from(json['style'] as Map) : {}) : const TextEditorStyle(),
+      icons: json['icons'] != null ? TextEditorIcons.fromJson(json['icons'] is Map ? Map<String, dynamic>.from(json['icons'] as Map) : {}) : const TextEditorIcons(),
+      widgets: json['widgets'] != null ? TextEditorWidgets.fromJson(json['widgets'] is Map ? Map<String, dynamic>.from(json['widgets'] as Map) : {}) : const TextEditorWidgets(),
     );
   }
 }

@@ -1,4 +1,4 @@
-import '../../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 import './i18n_layer_interaction.dart';
 import './i18n_paint_editor.dart';
 import './i18n_text_editor.dart';
@@ -52,42 +52,42 @@ class I18n {
   factory I18n.fromJson(Map<String, dynamic> json) {
     return I18n(
       layerInteraction: json['layerInteraction'] != null
-          ? I18nLayerInteraction.fromJson(utils.JsonUtils.parseMap(json['layerInteraction']))
+          ? I18nLayerInteraction.fromJson(json['layerInteraction'] is Map ? Map<String, dynamic>.from(json['layerInteraction'] as Map) : {})
           : const I18nLayerInteraction(),
       paintEditor: json['paintEditor'] != null
-          ? I18nPaintEditor.fromJson(utils.JsonUtils.parseMap(json['paintEditor']))
+          ? I18nPaintEditor.fromJson(json['paintEditor'] is Map ? Map<String, dynamic>.from(json['paintEditor'] as Map) : {})
           : const I18nPaintEditor(),
       textEditor: json['textEditor'] != null
-          ? I18nTextEditor.fromJson(utils.JsonUtils.parseMap(json['textEditor']))
+          ? I18nTextEditor.fromJson(json['textEditor'] is Map ? Map<String, dynamic>.from(json['textEditor'] as Map) : {})
           : const I18nTextEditor(),
       cropRotateEditor: json['cropRotateEditor'] != null
-          ? I18nCropRotateEditor.fromJson(utils.JsonUtils.parseMap(json['cropRotateEditor']))
+          ? I18nCropRotateEditor.fromJson(json['cropRotateEditor'] is Map ? Map<String, dynamic>.from(json['cropRotateEditor'] as Map) : {})
           : const I18nCropRotateEditor(),
       tuneEditor: json['tuneEditor'] != null
-          ? I18nTuneEditor.fromJson(utils.JsonUtils.parseMap(json['tuneEditor']))
+          ? I18nTuneEditor.fromJson(json['tuneEditor'] is Map ? Map<String, dynamic>.from(json['tuneEditor'] as Map) : {})
           : const I18nTuneEditor(),
       filterEditor: json['filterEditor'] != null
-          ? I18nFilterEditor.fromJson(utils.JsonUtils.parseMap(json['filterEditor']))
+          ? I18nFilterEditor.fromJson(json['filterEditor'] is Map ? Map<String, dynamic>.from(json['filterEditor'] as Map) : {})
           : const I18nFilterEditor(),
       blurEditor: json['blurEditor'] != null
-          ? I18nBlurEditor.fromJson(utils.JsonUtils.parseMap(json['blurEditor']))
+          ? I18nBlurEditor.fromJson(json['blurEditor'] is Map ? Map<String, dynamic>.from(json['blurEditor'] as Map) : {})
           : const I18nBlurEditor(),
       emojiEditor: json['emojiEditor'] != null
-          ? I18nEmojiEditor.fromJson(utils.JsonUtils.parseMap(json['emojiEditor']))
+          ? I18nEmojiEditor.fromJson(json['emojiEditor'] is Map ? Map<String, dynamic>.from(json['emojiEditor'] as Map) : {})
           : const I18nEmojiEditor(),
       stickerEditor: json['stickerEditor'] != null
-          ? I18nStickerEditor.fromJson(utils.JsonUtils.parseMap(json['stickerEditor']))
+          ? I18nStickerEditor.fromJson(json['stickerEditor'] is Map ? Map<String, dynamic>.from(json['stickerEditor'] as Map) : {})
           : const I18nStickerEditor(),
       various: json['various'] != null
-          ? I18nVarious.fromJson(utils.JsonUtils.parseMap(json['various']))
+          ? I18nVarious.fromJson(json['various'] is Map ? Map<String, dynamic>.from(json['various'] as Map) : {})
           : const I18nVarious(),
-      importStateHistoryMsg: utils.JsonUtils.parseString(json['importStateHistoryMsg'], 'Initialize Editor'),
-      cancel: utils.JsonUtils.parseString(json['cancel'], 'Cancel'),
-      undo: utils.JsonUtils.parseString(json['undo'], 'Undo'),
-      redo: utils.JsonUtils.parseString(json['redo'], 'Redo'),
-      done: utils.JsonUtils.parseString(json['done'], 'Done'),
-      remove: utils.JsonUtils.parseString(json['remove'], 'Remove'),
-      doneLoadingMsg: utils.JsonUtils.parseString(json['doneLoadingMsg'], 'Changes are being applied'),
+      importStateHistoryMsg: parseString(json['importStateHistoryMsg'] as String?, 'Initialize Editor'),
+      cancel: parseString(json['cancel'] as String?, 'Cancel'),
+      undo: parseString(json['undo'] as String?, 'Undo'),
+      redo: parseString(json['redo'] as String?, 'Redo'),
+      done: parseString(json['done'] as String?, 'Done'),
+      remove: parseString(json['remove'] as String?, 'Remove'),
+      doneLoadingMsg: parseString(json['doneLoadingMsg'] as String?, 'Changes are being applied'),
     );
   }
 }

@@ -1,5 +1,3 @@
-import '../utils/json_utils.dart' as utils; // Ensure correct relative path
-
 class CropRotateEditorIcons {
   const CropRotateEditorIcons(); // Simplest const constructor
 

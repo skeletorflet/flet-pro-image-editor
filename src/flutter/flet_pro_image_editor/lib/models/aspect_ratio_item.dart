@@ -1,4 +1,4 @@
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class AspectRatioItem {
   final String text;
@@ -11,8 +11,8 @@ class AspectRatioItem {
 
   factory AspectRatioItem.fromJson(Map<String, dynamic> json) {
     return AspectRatioItem(
-      text: utils.JsonUtils.parseString(json['text'], ''),
-      value: utils.JsonUtils.parseDouble(json['value'], 0.0),
+      text: parseString(json['text'] as String?, ''),
+      value: parseDouble(json['value'], 0.0),
     );
   }
 }

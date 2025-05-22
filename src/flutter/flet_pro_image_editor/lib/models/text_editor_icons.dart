@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; // For default Icon names, if needed for reference
-import '../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class TextEditorIcons {
   final String bottomNavBar;
@@ -26,15 +26,15 @@ class TextEditorIcons {
 
   factory TextEditorIcons.fromJson(Map<String, dynamic> json) {
     return TextEditorIcons(
-      bottomNavBar: utils.JsonUtils.parseIconDataPlaceholder(json['bottomNavBar'], "Icons.title_rounded"),
-      alignLeft: utils.JsonUtils.parseIconDataPlaceholder(json['alignLeft'], "Icons.align_horizontal_left_rounded"),
-      alignCenter: utils.JsonUtils.parseIconDataPlaceholder(json['alignCenter'], "Icons.align_horizontal_center_rounded"),
-      alignRight: utils.JsonUtils.parseIconDataPlaceholder(json['alignRight'], "Icons.align_horizontal_right_rounded"),
-      fontScale: utils.JsonUtils.parseIconDataPlaceholder(json['fontScale'], "Icons.format_size_rounded"),
-      resetFontScale: utils.JsonUtils.parseIconDataPlaceholder(json['resetFontScale'], "Icons.refresh_rounded"),
-      backgroundMode: utils.JsonUtils.parseIconDataPlaceholder(json['backgroundMode'], "Icons.layers_rounded"),
-      applyChanges: utils.JsonUtils.parseIconDataPlaceholder(json['applyChanges'], "Icons.done"),
-      backButton: utils.JsonUtils.parseIconDataPlaceholder(json['backButton'], "Icons.arrow_back"),
+      bottomNavBar: json['bottomNavBar'] as String? ?? "Icons.title_rounded",
+      alignLeft: json['alignLeft'] as String? ?? "Icons.align_horizontal_left_rounded",
+      alignCenter: json['alignCenter'] as String? ?? "Icons.align_horizontal_center_rounded",
+      alignRight: json['alignRight'] as String? ?? "Icons.align_horizontal_right_rounded",
+      fontScale: json['fontScale'] as String? ?? "Icons.format_size_rounded",
+      resetFontScale: json['resetFontScale'] as String? ?? "Icons.refresh_rounded",
+      backgroundMode: json['backgroundMode'] as String? ?? "Icons.layers_rounded",
+      applyChanges: json['applyChanges'] as String? ?? "Icons.done",
+      backButton: json['backButton'] as String? ?? "Icons.arrow_back",
     );
   }
 }

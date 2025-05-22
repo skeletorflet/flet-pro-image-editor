@@ -1,4 +1,4 @@
-import '../../utils/json_utils.dart' as utils;
+import 'package:flet/flet.dart';
 
 class I18nStickerEditor {
   final String bottomNavigationBarText;
@@ -11,7 +11,7 @@ class I18nStickerEditor {
 
   factory I18nStickerEditor.fromJson(Map<String, dynamic> json) {
     return I18nStickerEditor(
-      bottomNavigationBarText: utils.JsonUtils.parseString(json['bottomNavigationBarText'], 'Stickers'),
+      bottomNavigationBarText: parseString(json['bottomNavigationBarText'] as String?, 'Stickers'),
       // Add other fields if they exist in the Dart class definition
     );
   }
